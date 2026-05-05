@@ -233,7 +233,6 @@ npm run dev
 | `GEMINI_API_KEY` | backend `.env` | Gemini 2.5 Flash |
 | `FRED_API_KEY` | backend `.env` | FRED 거시 데이터 |
 | `KRX_API_KEY` | backend `.env` | KRX Open API |
-| `KIS_API_KEY` / `KIS_API_SECRET` | backend `.env` | 한국투자증권 Open API |
 | `API_MODE` | backend `.env` | `live` / `mock` 전환 |
 
 ---
