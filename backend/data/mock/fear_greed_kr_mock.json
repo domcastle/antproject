@@ -1,0 +1,14 @@
+{
+  "score": 45,
+  "status": "neutral",
+  "market": "KR",
+  "components": {
+    "vkospi": 52.0,
+    "momentum": 48.0,
+    "stock_strength": 46.0,
+    "trend": 44.0,
+    "kosdaq": 42.0,
+    "safe_asset": 40.0
+  },
+  "updated_at": "2026-05-05T09:00:00Z"
+}

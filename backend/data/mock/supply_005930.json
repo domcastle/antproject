@@ -1,0 +1,182 @@
+[
+  {
+    "date": "2026-04-01",
+    "individual": 0,
+    "foreign": -800000,
+    "institution": 800000
+  },
+  {
+    "date": "2026-04-02",
+    "individual": 574025,
+    "foreign": -692820,
+    "institution": 118795
+  },
+  {
+    "date": "2026-04-03",
+    "individual": 1060660,
+    "foreign": -400000,
+    "institution": -660660
+  },
+  {
+    "date": "2026-04-06",
+    "individual": 1385819,
+    "foreign": 0,
+    "institution": -1385819
+  },
+  {
+    "date": "2026-04-07",
+    "individual": 1500000,
+    "foreign": 399999,
+    "institution": -1899999
+  },
+  {
+    "date": "2026-04-08",
+    "individual": 1385819,
+    "foreign": 692820,
+    "institution": -2078639
+  },
+  {
+    "date": "2026-04-09",
+    "individual": 1060660,
+    "foreign": 800000,
+    "institution": -1860660
+  },
+  {
+    "date": "2026-04-10",
+    "individual": 574025,
+    "foreign": 692820,
+    "institution": -1266845
+  },
+  {
+    "date": "2026-04-13",
+    "individual": 0,
+    "foreign": 400000,
+    "institution": -400000
+  },
+  {
+    "date": "2026-04-14",
+    "individual": -574025,
+    "foreign": 0,
+    "institution": 574025
+  },
+  {
+    "date": "2026-04-15",
+    "individual": -1060660,
+    "foreign": -400000,
+    "institution": 1460660
+  },
+  {
+    "date": "2026-04-16",
+    "individual": -1385819,
+    "foreign": -692820,
+    "institution": 2078639
+  },
+  {
+    "date": "2026-04-17",
+    "individual": -1500000,
+    "foreign": -800000,
+    "institution": 2300000
+  },
+  {
+    "date": "2026-04-20",
+    "individual": -1385819,
+    "foreign": -692820,
+    "institution": 2078639
+  },
+  {
+    "date": "2026-04-21",
+    "individual": -1060660,
+    "foreign": -400000,
+    "institution": 1460660
+  },
+  {
+    "date": "2026-04-22",
+    "individual": -574025,
+    "foreign": 0,
+    "institution": 574025
+  },
+  {
+    "date": "2026-04-23",
+    "individual": 0,
+    "foreign": 399999,
+    "institution": -399999
+  },
+  {
+    "date": "2026-04-24",
+    "individual": 574025,
+    "foreign": 692820,
+    "institution": -1266845
+  },
+  {
+    "date": "2026-04-27",
+    "individual": 1060660,
+    "foreign": 800000,
+    "institution": -1860660
+  },
+  {
+    "date": "2026-04-28",
+    "individual": 1385819,
+    "foreign": 692820,
+    "institution": -2078639
+  },
+  {
+    "date": "2026-04-29",
+    "individual": 1500000,
+    "foreign": 399999,
+    "institution": -1899999
+  },
+  {
+    "date": "2026-04-30",
+    "individual": 1385819,
+    "foreign": 0,
+    "institution": -1385819
+  },
+  {
+    "date": "2026-05-01",
+    "individual": 1060660,
+    "foreign": -399999,
+    "institution": -660661
+  },
+  {
+    "date": "2026-05-04",
+    "individual": 574025,
+    "foreign": -692820,
+    "institution": 118795
+  },
+  {
+    "date": "2026-05-05",
+    "individual": 0,
+    "foreign": -800000,
+    "institution": 800000
+  },
+  {
+    "date": "2026-05-06",
+    "individual": -574025,
+    "foreign": -692820,
+    "institution": 1266845
+  },
+  {
+    "date": "2026-05-07",
+    "individual": -1060660,
+    "foreign": -399999,
+    "institution": 1460659
+  },
+  {
+    "date": "2026-05-08",
+    "individual": -1385819,
+    "foreign": 0,
+    "institution": 1385819
+  },
+  {
+    "date": "2026-05-11",
+    "individual": -1500000,
+    "foreign": 399999,
+    "institution": 1100001
+  },
+  {
+    "date": "2026-05-12",
+    "individual": -1385819,
+    "foreign": 692820,
+    "institution": 692999
+  }
+]

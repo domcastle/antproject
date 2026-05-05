@@ -1,0 +1,110 @@
+[
+  {
+    "code": "005930",
+    "name": "삼성전자",
+    "market": "KR",
+    "price": 62500,
+    "change_pct": 1.22,
+    "volume": 12345678,
+    "zone": 2
+  },
+  {
+    "code": "000660",
+    "name": "SK하이닉스",
+    "market": "KR",
+    "price": 185000,
+    "change_pct": 0.54,
+    "volume": 2345678,
+    "zone": 3
+  },
+  {
+    "code": "035420",
+    "name": "NAVER",
+    "market": "KR",
+    "price": 198000,
+    "change_pct": -0.5,
+    "volume": 987654,
+    "zone": 3
+  },
+  {
+    "code": "005380",
+    "name": "현대차",
+    "market": "KR",
+    "price": 225000,
+    "change_pct": 0.89,
+    "volume": 1234567,
+    "zone": 2
+  },
+  {
+    "code": "051910",
+    "name": "LG화학",
+    "market": "KR",
+    "price": 412000,
+    "change_pct": -1.2,
+    "volume": 567890,
+    "zone": 4
+  },
+  {
+    "code": "AAPL",
+    "name": "Apple",
+    "market": "US",
+    "price": 182.5,
+    "change_pct": 0.33,
+    "volume": 55678901,
+    "zone": 3
+  },
+  {
+    "code": "MSFT",
+    "name": "Microsoft",
+    "market": "US",
+    "price": 415.2,
+    "change_pct": 0.65,
+    "volume": 21345678,
+    "zone": 2
+  },
+  {
+    "code": "GOOGL",
+    "name": "Alphabet",
+    "market": "US",
+    "price": 173.8,
+    "change_pct": -0.22,
+    "volume": 18765432,
+    "zone": 3
+  },
+  {
+    "code": "AMZN",
+    "name": "Amazon",
+    "market": "US",
+    "price": 186.4,
+    "change_pct": 1.05,
+    "volume": 35678901,
+    "zone": 2
+  },
+  {
+    "code": "META",
+    "name": "Meta",
+    "market": "US",
+    "price": 478.9,
+    "change_pct": 0.78,
+    "volume": 14567890,
+    "zone": 2
+  },
+  {
+    "code": "NVDA",
+    "name": "NVIDIA",
+    "market": "US",
+    "price": 875.3,
+    "change_pct": 2.15,
+    "volume": 42345678,
+    "zone": 1
+  },
+  {
+    "code": "TSLA",
+    "name": "Tesla",
+    "market": "US",
+    "price": 175.6,
+    "change_pct": -1.35,
+    "volume": 98765432,
+    "zone": 4
+  }
+]

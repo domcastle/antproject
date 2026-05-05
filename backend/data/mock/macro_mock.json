@@ -1,0 +1,41 @@
+{
+  "buffett_index": 105.3,
+  "buffett_status": "overvalued",
+  "m7_betas": [
+    {
+      "code": "AAPL",
+      "name": "Apple",
+      "beta": 1.2
+    },
+    {
+      "code": "MSFT",
+      "name": "Microsoft",
+      "beta": 0.9
+    },
+    {
+      "code": "GOOGL",
+      "name": "Alphabet",
+      "beta": 1.1
+    },
+    {
+      "code": "AMZN",
+      "name": "Amazon",
+      "beta": 1.3
+    },
+    {
+      "code": "META",
+      "name": "Meta",
+      "beta": 1.4
+    },
+    {
+      "code": "NVDA",
+      "name": "NVIDIA",
+      "beta": 1.8
+    },
+    {
+      "code": "TSLA",
+      "name": "Tesla",
+      "beta": 2.1
+    }
+  ]
+}

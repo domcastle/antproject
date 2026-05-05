@@ -1,0 +1,124 @@
+{
+  "events": [
+    {
+      "date": "2026-01-28",
+      "type": "rate",
+      "title": "FOMC 금리 결정",
+      "badge_color": "#fef3c7"
+    },
+    {
+      "date": "2026-02-11",
+      "type": "cpi",
+      "title": "미국 CPI 발표",
+      "badge_color": "#fef9c3"
+    },
+    {
+      "date": "2026-03-18",
+      "type": "rate",
+      "title": "FOMC 금리 결정",
+      "badge_color": "#fef3c7"
+    },
+    {
+      "date": "2026-03-20",
+      "type": "witching",
+      "title": "쿼드러플 위칭데이",
+      "badge_color": "#fee2e2"
+    },
+    {
+      "date": "2026-04-08",
+      "type": "earnings",
+      "title": "삼성전자 실적 발표",
+      "badge_color": "#dbeafe"
+    },
+    {
+      "date": "2026-04-14",
+      "type": "cpi",
+      "title": "미국 CPI 발표",
+      "badge_color": "#fef9c3"
+    },
+    {
+      "date": "2026-05-06",
+      "type": "rate",
+      "title": "FOMC 금리 결정",
+      "badge_color": "#fef3c7"
+    },
+    {
+      "date": "2026-05-13",
+      "type": "cpi",
+      "title": "미국 CPI 발표",
+      "badge_color": "#fef9c3"
+    },
+    {
+      "date": "2026-05-15",
+      "type": "witching",
+      "title": "트리플 위칭데이",
+      "badge_color": "#fee2e2"
+    },
+    {
+      "date": "2026-06-10",
+      "type": "earnings",
+      "title": "애플 실적 발표",
+      "badge_color": "#dbeafe"
+    },
+    {
+      "date": "2026-06-17",
+      "type": "rate",
+      "title": "FOMC 금리 결정",
+      "badge_color": "#fef3c7"
+    },
+    {
+      "date": "2026-06-19",
+      "type": "witching",
+      "title": "쿼드러플 위칭데이",
+      "badge_color": "#fee2e2"
+    },
+    {
+      "date": "2026-07-15",
+      "type": "cpi",
+      "title": "미국 CPI 발표",
+      "badge_color": "#fef9c3"
+    },
+    {
+      "date": "2026-07-29",
+      "type": "rate",
+      "title": "FOMC 금리 결정",
+      "badge_color": "#fef3c7"
+    },
+    {
+      "date": "2026-09-16",
+      "type": "rate",
+      "title": "FOMC 금리 결정",
+      "badge_color": "#fef3c7"
+    },
+    {
+      "date": "2026-09-18",
+      "type": "witching",
+      "title": "쿼드러플 위칭데이",
+      "badge_color": "#fee2e2"
+    },
+    {
+      "date": "2026-10-14",
+      "type": "cpi",
+      "title": "미국 CPI 발표",
+      "badge_color": "#fef9c3"
+    },
+    {
+      "date": "2026-11-04",
+      "type": "rate",
+      "title": "FOMC 금리 결정",
+      "badge_color": "#fef3c7"
+    },
+    {
+      "date": "2026-12-09",
+      "type": "rate",
+      "title": "FOMC 금리 결정",
+      "badge_color": "#fef3c7"
+    },
+    {
+      "date": "2026-12-18",
+      "type": "witching",
+      "title": "쿼드러플 위칭데이",
+      "badge_color": "#fee2e2"
+    }
+  ]
+}
