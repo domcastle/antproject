@@ -1,49 +1,47 @@
-{
-  "rates": [
-    {
-      "currency": "USD",
-      "label": "달러",
-      "rate": 1379.5,
-      "change": -5.1,
-      "change_pct": -0.37,
-      "direction": "down",
-      "updated_at": "2026-05-05T09:00:00Z"
-    },
-    {
-      "currency": "EUR",
-      "label": "유로",
-      "rate": 1521.3,
-      "change": 2.3,
-      "change_pct": 0.15,
-      "direction": "up",
-      "updated_at": "2026-05-05T09:00:00Z"
-    },
-    {
-      "currency": "JPY",
-      "label": "엔",
-      "rate": 9.21,
-      "change": -0.05,
-      "change_pct": -0.54,
-      "direction": "down",
-      "updated_at": "2026-05-05T09:00:00Z"
-    },
-    {
-      "currency": "CNY",
-      "label": "위안",
-      "rate": 190.4,
-      "change": 0.2,
-      "change_pct": 0.11,
-      "direction": "up",
-      "updated_at": "2026-05-05T09:00:00Z"
-    },
-    {
-      "currency": "GBP",
-      "label": "파운드",
-      "rate": 1751.8,
-      "change": -8.2,
-      "change_pct": -0.47,
-      "direction": "down",
-      "updated_at": "2026-05-05T09:00:00Z"
-    }
-  ]
-}
+[
+  {
+    "currency": "USD",
+    "label": "달러",
+    "rate": 1379.5,
+    "change": -5.1,
+    "change_pct": -0.37,
+    "direction": "down",
+    "updated_at": "2026-05-05T09:00:00Z"
+  },
+  {
+    "currency": "EUR",
+    "label": "유로",
+    "rate": 1521.3,
+    "change": 2.3,
+    "change_pct": 0.15,
+    "direction": "up",
+    "updated_at": "2026-05-05T09:00:00Z"
+  },
+  {
+    "currency": "JPY",
+    "label": "엔",
+    "rate": 9.21,
+    "change": -0.05,
+    "change_pct": -0.54,
+    "direction": "down",
+    "updated_at": "2026-05-05T09:00:00Z"
+  },
+  {
+    "currency": "CNY",
+    "label": "위안",
+    "rate": 190.4,
+    "change": 0.2,
+    "change_pct": 0.11,
+    "direction": "up",
+    "updated_at": "2026-05-05T09:00:00Z"
+  },
+  {
+    "currency": "GBP",
+    "label": "파운드",
+    "rate": 1751.8,
+    "change": -8.2,
+    "change_pct": -0.47,
+    "direction": "down",
+    "updated_at": "2026-05-05T09:00:00Z"
+  }
+]

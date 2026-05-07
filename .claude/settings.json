@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Administrator\\\\Documents\\\\antproject\\\\antproject\" -Recurse -Force)",
+      "Bash(Select-Object FullName, PSIsContainer)",
+      "Bash(Sort-Object FullName)",
+      "Read(//c/Users/Administrator/antproject/app/api/stock/**)",
+      "PowerShell(ls -Recurse \"C:\\\\Users\\\\Administrator\\\\antproject\" -Depth 3 -Force | Where-Object { $_.PSIsContainer -eq $false } | Select-Object FullName | Sort-Object FullName | head -100)",
+      "PowerShell(ls -Recurse \"C:\\\\Users\\\\Administrator\\\\antproject\" -Depth 3 -Force | Where-Object { $_.PSIsContainer -eq $false } | Select-Object FullName | Sort-Object FullName)",
+      "PowerShell(tree /F \"C:\\\\Users\\\\Administrator\\\\antproject\" /A 2>$null | Select-String -Pattern \"^\" -Context 0,200 | ForEach-Object { $_.Line } | head -150)",
+      "Read(//c/Users/Administrator/antproject/**)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\Administrator\\\\antproject\" -Recurse -Exclude \"node_modules\" -Force | Where-Object { -not $_.PSIsContainer } | Select-Object FullName | Sort-Object)",
+      "PowerShell(ls \"C:\\\\Users\\\\Administrator\\\\antproject\" -Force | Where-Object { -not $_.PSIsContainer } | Select-Object Name, Length)",
+      "Bash(dir \"c:\\\\Users\\\\Administrator\\\\antproject\\\\components\\\\\" /b)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\Administrator\\antproject\\lib",
+      "c:\\Users\\Administrator\\antproject\\components",
+      "c:\\Users\\Administrator\\antproject\\app"
+    ]
+  }
+}
