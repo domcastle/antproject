@@ -38,10 +38,13 @@ async def lifespan(app: FastAPI):
     # 1. KRX 로그인 — 실패해도 앱 부팅 계속
     if KRX_ID and KRX_PW:
         try:
-            from pykrx import stock
-            stock.set_krx_id(KRX_ID)
-            stock.set_krx_password(KRX_PW)
-            logger.info("KRX login success")
+            from pykrx.website.comm.auth import build_krx_session, set_auth_session
+            krx_session = build_krx_session(KRX_ID, KRX_PW)
+            set_auth_session(krx_session)
+            if krx_session:
+                logger.info("KRX login success")
+            else:
+                logger.warning("KRX login failed — invalid credentials")
         except Exception as e:
             logger.warning(f"KRX login failed (non-fatal): {e}")
     else:

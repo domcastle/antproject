@@ -18,7 +18,8 @@
       "PowerShell(curl *)",
       "Bash(python3 *)",
       "PowerShell(Invoke-RestMethod -Uri \"http://localhost:8000/api/stock/005930/supply\" -Method GET | ConvertTo-Json -Depth 5)",
-      "PowerShell(Invoke-RestMethod -Uri \"http://localhost:8000/api/insight/005930\" -Method POST | ConvertTo-Json -Depth 3)"
+      "PowerShell(Invoke-RestMethod -Uri \"http://localhost:8000/api/insight/005930\" -Method POST | ConvertTo-Json -Depth 3)",
+      "Bash(python *)"
     ]
   }
 }

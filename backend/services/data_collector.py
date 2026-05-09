@@ -313,7 +313,8 @@ def _fetch_stock_list_live() -> list[dict]:
     """KOSPI 대형주 + M7 종목 리스트 (현재가, 등락률, 거래금액, zone)."""
     from pykrx import stock
 
-    today   = _now().strftime("%Y%m%d")
+    today       = _now().strftime("%Y%m%d")
+    trading_day = stock.get_nearest_business_day_in_a_week(today, prev=True)
     kr_codes = ["005930", "000660", "035420", "005380", "051910"]
     kr_names = {"005930": "삼성전자", "000660": "SK하이닉스", "035420": "NAVER",
                 "005380": "현대차", "051910": "LG화학"}
@@ -325,7 +326,7 @@ def _fetch_stock_list_live() -> list[dict]:
 
     # KR
     try:
-        df_ohlcv = stock.get_market_ohlcv(today, market="KOSPI")
+        df_ohlcv = stock.get_market_ohlcv(trading_day, market="KOSPI")
         for code in kr_codes:
             if code in df_ohlcv.index:
                 row = df_ohlcv.loc[code]
@@ -336,8 +337,9 @@ def _fetch_stock_list_live() -> list[dict]:
                     "volume": int(row.get("거래대금", 0)) // 10000,
                     "zone": 3,  # silhouette.py가 정밀 계산 — 여기서는 중립값
                 })
+        logger.info(f"stock_list KR live ok: {trading_day}")
     except Exception as e:
-        logger.warning(f"KR stock list fetch failed: {e}")
+        logger.warning(f"KR stock list fetch failed: {type(e).__name__}: {e}")
 
     # US (M7)
     for code in m7_codes:
@@ -406,15 +408,25 @@ def _fetch_supply_live(code: str) -> list[dict]:
 
     today   = _now().strftime("%Y%m%d")
     from_dt = (datetime.now(timezone.utc) - pd.Timedelta(days=45)).strftime("%Y%m%d")
-    df = stock.get_market_trading_value_by_investor(from_dt, today, code)
+    # get_market_trading_value_by_date: 날짜 인덱스, 컬럼 = 개인/외국인합계/기관합계 (flat, on="순매수")
+    df = stock.get_market_trading_value_by_date(from_dt, today, code)
+
+    if df.empty:
+        return []
 
     rows = []
     for dt_idx, row in df.iterrows():
+        try:
+            individual  = int(row.get("개인",      0) // 10000)
+            foreign     = int(row.get("외국인합계", 0) // 10000)
+            institution = int(row.get("기관합계",   0) // 10000)
+        except Exception:
+            continue
         rows.append({
             "date":        str(dt_idx)[:10],
-            "individual":  int(row.loc["개인",   "순매수"] // 10000),
-            "foreign":     int(row.loc["외국인", "순매수"] // 10000),
-            "institution": int(row.loc["기관합계","순매수"] // 10000),
+            "individual":  individual,
+            "foreign":     foreign,
+            "institution": institution,
         })
     return rows[-30:]  # 최근 30일
 

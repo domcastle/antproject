@@ -1,5 +1,8 @@
 import os
 
+from dotenv import load_dotenv
+load_dotenv()
+
 # Scheduler intervals
 POLL_INTERVAL_SEC: int = 900
 INSIGHT_CACHE_SEC: int = 3600

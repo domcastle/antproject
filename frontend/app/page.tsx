@@ -1,11 +1,13 @@
 
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import {
   STOCKS, MARKET_INDICES, FEAR_GREED, BUFFETT, CALENDAR_EVENTS,
   getFearGreedEmoji, calcSilhouetteZone,
 } from '@/lib/mockData';
+import useSWR from 'swr';
+import { fetchStockList, SWR_POLL } from '@/lib/api';
 import FearGreedGauge from '@/components/FearGreedGauge';
 import BuffettGauge from '@/components/BuffettGauge';
 import StockCard from '@/components/StockCard';
@@ -44,8 +46,18 @@ export default function HomePage() {
 
   // FastAPI 직접 연동
   const [apiIndices, setApiIndices]     = useState<Record<string, any>>({});  // code → {current, change_pct, sparkline}
-  const [apiStockList, setApiStockList] = useState<Record<string, any>>({});  // code → {price, change_pct, zone}
   const [apiMacro, setApiMacro]         = useState<{ m7_betas: { code: string; name: string; beta: number }[] } | null>(null);
+
+  const { data: stockListRaw } = useSWR<Array<{ code: string; price: number; change_pct: number; zone: number }>>(
+    'stock-list',
+    () => fetchStockList().then(r => r.json()),
+    SWR_POLL,
+  );
+  const apiStockList = useMemo(() => {
+    const map: Record<string, any> = {};
+    stockListRaw?.forEach(d => { map[d.code] = d; });
+    return map;
+  }, [stockListRaw]);
 
   useEffect(() => {
     // ① Yahoo Finance 현재가 (Next.js 로컬 route)
@@ -84,17 +96,6 @@ export default function HomePage() {
         const map: Record<string, any> = {};
         data.forEach(d => { map[d.code] = d; });
         setApiIndices(map);
-      })
-      .catch(() => {});
-
-    // ⑤ 종목 리스트 (FastAPI) — [{code, name, market, price, change_pct, volume, zone}]
-    fetch(`${base}/api/stock/list`)
-      .then(r => r.json())
-      .then((data: Array<{ code: string; price: number; change_pct: number; zone: number }>) => {
-        if (!Array.isArray(data)) return;
-        const map: Record<string, any> = {};
-        data.forEach(d => { map[d.code] = d; });
-        setApiStockList(map);
       })
       .catch(() => {});
 
