@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\SSAFY\\\\Desktop\\\\antproject\\\\frontend\" -Recurse)",
+      "Bash(Select-Object FullName)",
+      "PowerShell(npm *)",
+      "Bash(npm --version)",
+      "Bash(npm view *)",
+      "Bash(npx create-next-app@16.2.0 . --typescript --tailwind --app --no-git --eslint --yes)",
+      "Bash(npm install *)",
+      "Bash(grep -E \"^\\(recharts|motion|swr|date-fns\\)$\")",
+      "Bash(node -e \"const p=require\\('./node_modules/tailwindcss/package.json'\\); console.log\\('tailwindcss:', p.version\\)\")",
+      "Bash(node -e \"const p=require\\('./node_modules/typescript/package.json'\\); console.log\\('typescript:', p.version\\)\")",
+      "Bash(npx tsc *)",
+      "Bash(npx next *)",
+      "Bash(dir /s /b \"C:\\\\Users\\\\SSAFY\\\\Desktop\\\\antproject\\\\backend\\\\*.py\")",
+      "PowerShell(uvicorn main:app *)",
+      "PowerShell(curl *)",
+      "Bash(python3 *)",
+      "PowerShell(Invoke-RestMethod -Uri \"http://localhost:8000/api/stock/005930/supply\" -Method GET | ConvertTo-Json -Depth 5)",
+      "PowerShell(Invoke-RestMethod -Uri \"http://localhost:8000/api/insight/005930\" -Method POST | ConvertTo-Json -Depth 3)"
+    ]
+  }
+}
