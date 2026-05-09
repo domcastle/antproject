@@ -53,7 +53,7 @@ KR_FG_TREND_MAX: float = 10.0
 KR_FG_SAFE_ASSET_MIN: float = 1.0
 KR_FG_SAFE_ASSET_MAX: float = 5.0
 KR_FG_SAFE_ASSET_DEFAULT: float = 50.0
-KR_FG_SAFE_ASSET_BOND: str = "국고채 3년"
+KR_FG_SAFE_ASSET_BOND: str = "국고채3년"
 
 # CNN Fear & Greed (스파이크 확정: Chrome/131 + Referer 필수)
 CNN_FG_URL: str = "https://production.dataviz.cnn.io/index/fearandgreed/graphdata"

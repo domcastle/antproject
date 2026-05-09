@@ -27,7 +27,6 @@ from constants import (
     EXCHANGE_TICKERS,
     KR_FG_MOMENTUM_MAX,
     KR_FG_MOMENTUM_MIN,
-    KR_FG_SAFE_ASSET_BOND,
     KR_FG_SAFE_ASSET_DEFAULT,
     KR_FG_SAFE_ASSET_MAX,
     KR_FG_SAFE_ASSET_MIN,
@@ -144,6 +143,11 @@ def _ttl_expired(cache_key: str) -> bool:
 # ── Live 수집 함수 (동기 블로킹 — asyncio.to_thread()로 감싸서 호출) ─────────
 
 def _fetch_exchange_live() -> list[dict]:
+    # CNYKRW=X는 yfinance 직접 조회 시 데이터 부족 → USDKRW/USDCNY 교차환율로 계산
+    _CROSS_RATE: dict[str, tuple[str, str]] = {
+        "CNY": ("USDKRW=X", "USDCNY=X"),
+    }
+
     rows = []
     for currency, info in EXCHANGE_TICKERS.items():
         ticker = info["ticker"]
@@ -152,11 +156,11 @@ def _fetch_exchange_live() -> list[dict]:
             df = yf.Ticker(ticker).history(period="5d", interval="1d")
             if len(df) < 2:
                 raise ValueError("insufficient data")
-            prev_close  = float(df["Close"].iloc[-2])
-            curr_close  = float(df["Close"].iloc[-1])
-            change      = round(curr_close - prev_close, 2)
-            change_pct  = round(change / prev_close * 100, 2) if prev_close else 0.0
-            direction   = "up" if change > 0 else ("down" if change < 0 else "flat")
+            prev_close = float(df["Close"].iloc[-2])
+            curr_close = float(df["Close"].iloc[-1])
+            change     = round(curr_close - prev_close, 2)
+            change_pct = round(change / prev_close * 100, 2) if prev_close else 0.0
+            direction  = "up" if change > 0 else ("down" if change < 0 else "flat")
             rows.append({
                 "currency":   currency,
                 "label":      label,
@@ -168,6 +172,42 @@ def _fetch_exchange_live() -> list[dict]:
             })
         except Exception as e:
             logger.warning(f"exchange {currency} failed: {e}")
+            if currency not in _CROSS_RATE:
+                continue
+
+            # 2단계: 교차환율 (USDKRW / USDCNY = CNYKRW)
+            num_t, den_t = _CROSS_RATE[currency]
+            try:
+                df_n = yf.Ticker(num_t).history(period="5d", interval="1d")
+                df_d = yf.Ticker(den_t).history(period="5d", interval="1d")
+                if len(df_n) < 2 or len(df_d) < 2:
+                    raise ValueError("cross-rate insufficient data")
+                prev_close = float(df_n["Close"].iloc[-2]) / float(df_d["Close"].iloc[-2])
+                curr_close = float(df_n["Close"].iloc[-1]) / float(df_d["Close"].iloc[-1])
+                change     = round(curr_close - prev_close, 2)
+                change_pct = round(change / prev_close * 100, 2) if prev_close else 0.0
+                direction  = "up" if change > 0 else ("down" if change < 0 else "flat")
+                rows.append({
+                    "currency":   currency,
+                    "label":      label,
+                    "rate":       round(curr_close, 2),
+                    "change":     change,
+                    "change_pct": change_pct,
+                    "direction":  direction,
+                    "updated_at": _now_iso(),
+                })
+                logger.info(f"exchange {currency} via cross-rate ({num_t} / {den_t})")
+            except Exception as e2:
+                logger.warning(f"exchange {currency} cross-rate failed: {e2} → mock fallback")
+                # 3단계: mock에서 CNY 단건 추출
+                try:
+                    mock_list  = load_mock("exchange_mock.json")
+                    mock_entry = next((m for m in mock_list if m["currency"] == currency), None)
+                    if mock_entry:
+                        rows.append({**mock_entry, "updated_at": _now_iso()})
+                except Exception:
+                    pass
+
     if not rows:
         raise RuntimeError("all exchange fetches failed")
     return rows
@@ -259,14 +299,23 @@ def _fetch_fear_greed_kr_live() -> dict:
     trend_pct    = (kospi_c[-1] - sma20) / sma20 * 100 if sma20 else 0.0
     trend_score  = _normalize(trend_pct, KR_FG_TREND_MIN, KR_FG_TREND_MAX)
 
-    # 06. 안전자산 수요 (가중치 0.05) — 국고채 3년
-    try:
-        df_bond    = bond.get_otc_treasury_yields(from_dt, today, KR_FG_SAFE_ASSET_BOND)
-        bond_yield = float(df_bond["수익률"].iloc[-1])
-        safe_asset_score = _normalize(bond_yield, KR_FG_SAFE_ASSET_MIN, KR_FG_SAFE_ASSET_MAX)
-    except Exception as e:
-        logger.warning(f"bond fetch failed: {e} → using default {KR_FG_SAFE_ASSET_DEFAULT}")
-        safe_asset_score = KR_FG_SAFE_ASSET_DEFAULT
+    # 06. 안전자산 수요 (가중치 0.05) — 국고채 3년 수익률
+    # pykrx 실제 함수: get_otc_treasury_yields_by_date(from, to, ticker)
+    # ticker2code 키: 공백 없는 "국고채3년" 형식
+    safe_asset_score = KR_FG_SAFE_ASSET_DEFAULT
+    for _ticker in ("국고채3년", "국고채5년", "국고채2년"):
+        try:
+            df_bond = bond.get_otc_treasury_yields(from_dt, today, _ticker)
+            if df_bond.empty:
+                continue
+            bond_yield = float(df_bond["수익률"].dropna().iloc[-1])
+            safe_asset_score = _normalize(bond_yield, KR_FG_SAFE_ASSET_MIN, KR_FG_SAFE_ASSET_MAX)
+            logger.info(f"bond yield [{_ticker}]: {bond_yield:.3f}% → score {safe_asset_score:.1f}")
+            break
+        except Exception as e:
+            logger.warning(f"bond ticker '{_ticker}' failed: {e}")
+    else:
+        logger.warning(f"all bond tickers failed → using default {KR_FG_SAFE_ASSET_DEFAULT}")
 
     score = (
         vkospi_score   * KR_FG_WEIGHT_VKOSPI

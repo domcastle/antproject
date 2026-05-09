@@ -19,7 +19,11 @@
       "Bash(python3 *)",
       "PowerShell(Invoke-RestMethod -Uri \"http://localhost:8000/api/stock/005930/supply\" -Method GET | ConvertTo-Json -Depth 5)",
       "PowerShell(Invoke-RestMethod -Uri \"http://localhost:8000/api/insight/005930\" -Method POST | ConvertTo-Json -Depth 3)",
-      "Bash(python *)"
+      "Bash(python *)",
+      "PowerShell(C:\\\\Users\\\\great\\\\Desktop\\\\antproject\\\\backend\\\\venv\\\\Scripts\\\\python.exe -c \"from pykrx.website.krx.bond.wrap import ticker2code; print\\(list\\(ticker2code.keys\\(\\)\\)\\)\")",
+      "PowerShell(C:\\\\Users\\\\great\\\\Desktop\\\\antproject\\\\backend\\\\venv\\\\Scripts\\\\python.exe -c \"import pykrx.website.krx.bond.wrap as m; print\\([x for x in dir\\(m\\) if not x.startswith\\('__'\\)]\\)\")",
+      "PowerShell(C:\\\\Users\\\\great\\\\Desktop\\\\antproject\\\\backend\\\\venv\\\\Scripts\\\\python.exe -c \"import pykrx.bond as b; print\\([x for x in dir\\(b\\) if not x.startswith\\('_'\\)]\\)\")",
+      "PowerShell(C:\\\\Users\\\\great\\\\Desktop\\\\antproject\\\\backend\\\\venv\\\\Scripts\\\\python.exe -c \"import pykrx.bond as b; help\\(b.get_otc_treasury_yields\\)\")"
     ]
   }
 }

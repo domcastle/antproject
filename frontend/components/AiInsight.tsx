@@ -37,7 +37,7 @@ function TypingDots() {
 function ReasonList({ reason }: { reason: string }) {
   const lines = reason
     .split("\n")
-    .map(l => l.replace(/^[\d①②③•\-\s]+/, "").trim())
+    .map(l => l.replace(/^[\d①②③•\-\s]+\.?\s*/, "").trim())
     .filter(Boolean);
 
   const NUMS = ["①", "②", "③", "④", "⑤"];

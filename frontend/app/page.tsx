@@ -11,6 +11,7 @@ import { fetchStockList, SWR_POLL } from '@/lib/api';
 import FearGreedGauge from '@/components/FearGreedGauge';
 import BuffettGauge from '@/components/BuffettGauge';
 import StockCard from '@/components/StockCard';
+import StockCardSkeleton from '@/components/StockCardSkeleton';
 import ExchangeTicker from '@/components/ExchangeTicker';
 
 const TABS = ['전체', '국내 KOSPI', '미국 M7'];
@@ -48,7 +49,7 @@ export default function HomePage() {
   const [apiIndices, setApiIndices]     = useState<Record<string, any>>({});  // code → {current, change_pct, sparkline}
   const [apiMacro, setApiMacro]         = useState<{ m7_betas: { code: string; name: string; beta: number }[] } | null>(null);
 
-  const { data: stockListRaw } = useSWR<Array<{ code: string; price: number; change_pct: number; zone: number }>>(
+  const { data: stockListRaw, isLoading: isStockListLoading } = useSWR<Array<{ code: string; price: number; change_pct: number; zone: number }>>(
     'stock-list',
     () => fetchStockList().then(r => r.json()),
     SWR_POLL,
@@ -404,9 +405,10 @@ export default function HomePage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-              {filteredStocks.map(stock => (
-                <StockCard key={stock.code} stock={stock} />
-              ))}
+              {isStockListLoading
+                ? Array.from({ length: 8 }).map((_, i) => <StockCardSkeleton key={i} />)
+                : filteredStocks.map(stock => <StockCard key={stock.code} stock={stock} />)
+              }
             </div>
           </div>
 

@@ -17,6 +17,7 @@ Skills.md Ch5.2 기반
 import json
 import logging
 import os
+import re
 from datetime import datetime, timezone
 
 from constants import API_MODE, GEMINI_API_KEY, GEMINI_MODEL, INSIGHT_CACHE_SEC, MOCK_DIR
@@ -131,7 +132,7 @@ def _build_prompt(data: dict) -> str:
 
 
 def _parse_response(text: str) -> dict:
-    """Gemini 응답에서 JSON 추출 및 파싱. 마크다운 코드블록 자동 제거."""
+    """Gemini 응답에서 JSON 추출 및 파싱. 마크다운 코드블록·제어 문자 자동 제거."""
     cleaned = text.strip()
     if cleaned.startswith("```"):
         lines   = cleaned.splitlines()
@@ -139,8 +140,11 @@ def _parse_response(text: str) -> dict:
             ln for ln in lines if not ln.strip().startswith("```")
         ).strip()
 
+    # \t \n \r를 제외한 ASCII 제어 문자 제거 (JSON 파싱 오류 방지)
+    cleaned = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", "", cleaned)
+
     parsed  = json.loads(cleaned)
-    summary = str(parsed.get("summary", "")).strip()[:20]  # 20자 강제 상한
+    summary = str(parsed.get("summary", "")).strip()
     reason  = str(parsed.get("reason", "")).strip()
 
     return {
