@@ -1,0 +1,569 @@
+﻿python : INFO:     Will watch for changes in these directories: ['C:\\Users\\Administrator\\Desktop\\test\\antproject\\
+backend']
+At line:1 char:72
++ ... t\backend"; python -m uvicorn main:app --host 0.0.0.0 --port 8000 --r ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (INFO:     Will ...ject\\backend']:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [37696] using WatchFiles
+INFO:     Started server process [36004]
+INFO:     Waiting for application startup.
+2026-05-10 20:11:25,072 [WARNING] main: KRX login failed (non-fatal): module 'pykrx.stock' has no attribute 'set_krx_id
+'
+2026-05-10 20:11:25,072 [INFO] services.data_collector: startup_fetch begin
+2026-05-10 20:11:25,072 [INFO] services.data_collector: _refresh_market start
+2026-05-10 20:11:26,251 [WARNING] services.data_collector: exchange CNY failed: insufficient data
+2026-05-10 20:11:34,048 [INFO] services.data_collector: _refresh_fear_greed start
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\site-packages\pykrx\website\comm\util.py", l
+ine 10, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\site-packages\pykrx\website\krx\bond\wrap.py
+", line 92, in get_otc_treasury_yields_by_date
+    df = ��������_���ä�Ǽ��ͷ�().fetch(fromdate, todate, ticker2code[ticker])
+                                                           ~~~~~~~~~~~^^^^^^^^
+KeyError: '����ä 3��'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\logging\__init__.py", line 1110, in emit
+    msg = self.format(record)
+          ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\logging\__init__.py", line 953, in format
+    return fmt.format(record)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\logging\__init__.py", line 687, in format
+    record.message = record.getMessage()
+                     ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\logging\__init__.py", line 377, in getMessag
+e
+    msg = msg % self.args
+          ~~~~^~~~~~~~~~~
+TypeError: not all arguments converted during string formatting
+Call stack:
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\threading.py", line 1002, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\threading.py", line 1045, in _bootstrap_inne
+r
+    self.run()
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\threading.py", line 982, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 83, in _
+worker
+    work_item.run()
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in r
+un
+    result = self.fn(*self.args, **self.kwargs)
+  File "C:\Users\Administrator\Desktop\test\antproject\backend\services\data_collector.py", line 264, in _fetch_fear_gr
+eed_kr_live
+    df_bond    = bond.get_otc_treasury_yields(from_dt, today, KR_FG_SAFE_ASSET_BOND)
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\site-packages\pykrx\bond\bond.py", line 72, 
+in get_otc_treasury_yields
+    df = krx.bond.get_otc_treasury_yields_by_date(*args)
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\site-packages\pykrx\website\comm\util.py", l
+ine 19, in wrapper
+    logging.info(args, kwargs)
+Message: ('20260110', '20260510', '����ä 3��')
+Arguments: ({},)
+2026-05-10 20:11:34,222 [INFO] root: '����ä 3��'
+2026-05-10 20:11:34,222 [WARNING] services.data_collector: bond fetch failed: '���ͷ�' �� using default 50.0
+2026-05-10 20:11:34,735 [INFO] httpx: HTTP Request: GET https://production.dataviz.cnn.io/index/fearandgreed/graphdata 
+"HTTP/1.1 200 OK"
+2026-05-10 20:11:34,740 [INFO] services.data_collector: _refresh_stock_list start
+2026-05-10 20:11:35,240 [INFO] services.data_collector: KR stock ohlcv using date: 20260508
+2026-05-10 20:11:36,259 [INFO] services.data_collector: startup_fetch done
+2026-05-10 20:11:36,260 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the 
+scheduler starts
+2026-05-10 20:11:36,260 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the 
+scheduler starts
+2026-05-10 20:11:36,260 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the 
+scheduler starts
+2026-05-10 20:11:36,261 [INFO] apscheduler.scheduler: Added job "_refresh_market" to job store "default"
+2026-05-10 20:11:36,261 [INFO] apscheduler.scheduler: Added job "_refresh_fear_greed" to job store "default"
+2026-05-10 20:11:36,261 [INFO] apscheduler.scheduler: Added job "_refresh_stock_list" to job store "default"
+2026-05-10 20:11:36,261 [INFO] apscheduler.scheduler: Scheduler started
+2026-05-10 20:11:36,261 [INFO] main: Scheduler started
+INFO:     Application startup complete.
+2026-05-10 20:11:50,251 [WARNING] services.data_collector: exchange CNY failed: insufficient data
+KRX �α��� �õ�...
+  �α��� ID: capt1114
+KRX �α��� �Ϸ�.
+  �α��� �ð�: 2026-05-10 20:11:25
+  ���� �ð�: 2026-05-10 21:11:25
+Error occurred in get_otc_treasury_yields_by_date: '����ä 3��'
+INFO:     127.0.0.1:11303 - "GET /api/market/exchange HTTP/1.1" 200 OK
+2026-05-10 20:11:50,514 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\site-packages\pykrx\website\comm\util.py", l
+ine 10, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\site-packages\pykrx\website\krx\bond\wrap.py
+", line 92, in get_otc_treasury_yields_by_date
+    df = ��������_���ä�Ǽ��ͷ�().fetch(fromdate, todate, ticker2code[ticker])
+                                                           ~~~~~~~~~~~^^^^^^^^
+KeyError: '����ä 3��'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\logging\__init__.py", line 1110, in emit
+    msg = self.format(record)
+          ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\logging\__init__.py", line 953, in format
+    return fmt.format(record)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\logging\__init__.py", line 687, in format
+    record.message = record.getMessage()
+                     ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\logging\__init__.py", line 377, in getMessag
+e
+    msg = msg % self.args
+          ~~~~^~~~~~~~~~~
+TypeError: not all arguments converted during string formatting
+Call stack:
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\threading.py", line 1002, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\threading.py", line 1045, in _bootstrap_inne
+r
+    self.run()
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\_backends\_asyncio.py", 
+line 976, in run
+    result = context.run(func, *args)
+  File "C:\Users\Administrator\Desktop\test\antproject\backend\routers\market.py", line 26, in fear_greed_kr
+    return get_fear_greed_kr()
+  File "C:\Users\Administrator\Desktop\test\antproject\backend\services\data_collector.py", line 648, in get_fear_greed
+_kr
+    return _with_fallback("fear_greed_kr", _fetch_fear_greed_kr_live, "fear_greed_kr_mock.json")
+  File "C:\Users\Administrator\Desktop\test\antproject\backend\services\data_collector.py", line 117, in _with_fallback
+    data = fetch_fn()
+  File "C:\Users\Administrator\Desktop\test\antproject\backend\services\data_collector.py", line 264, in _fetch_fear_gr
+eed_kr_live
+    df_bond    = bond.get_otc_treasury_yields(from_dt, today, KR_FG_SAFE_ASSET_BOND)
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\site-packages\pykrx\bond\bond.py", line 72, 
+in get_otc_treasury_yields
+    df = krx.bond.get_otc_treasury_yields_by_date(*args)
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\site-packages\pykrx\website\comm\util.py", l
+ine 19, in wrapper
+    logging.info(args, kwargs)
+Message: ('20260110', '20260510', '����ä 3��')
+Arguments: ({},)
+2026-05-10 20:11:50,657 [INFO] root: '����ä 3��'
+2026-05-10 20:11:50,658 [WARNING] services.data_collector: bond fetch failed: '���ͷ�' �� using default 50.0
+Error occurred in get_otc_treasury_yields_by_date: '����ä 3��'
+INFO:     127.0.0.1:8066 - "GET /api/market/fear-greed/kr HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2916 - "GET /api/market/indices HTTP/1.1" 200 OK
+2026-05-10 20:11:50,879 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+2026-05-10 20:11:51,025 [INFO] services.data_collector: KR stock ohlcv using date: 20260508
+2026-05-10 20:11:51,074 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini
+-2.5-flash:generateContent "HTTP/1.1 429 Too Many Requests"
+2026-05-10 20:11:51,074 [WARNING] services.gemini: Market Gemini call failed: 429 RESOURCE_EXHAUSTED. {'error': {'code'
+: 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on
+ this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https:
+//ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_reques
+ts, limit: 20, model: gemini-2.5-flash\nPlease retry in 9.19903651s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@t
+ype': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'ht
+tps://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violatio
+ns': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequ
+estsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.5-flash'}, 'quotaV
+alue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '9s'}]}} �� mock fallback
+INFO:     127.0.0.1:7921 - "POST /api/insight/market HTTP/1.1" 200 OK
+2026-05-10 20:11:51,177 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+2026-05-10 20:11:51,210 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+2026-05-10 20:11:51,287 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini
+-2.5-flash:generateContent "HTTP/1.1 429 Too Many Requests"
+2026-05-10 20:11:51,287 [WARNING] services.gemini: Market Gemini call failed: 429 RESOURCE_EXHAUSTED. {'error': {'code'
+: 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on
+ this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https:
+//ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_reques
+ts, limit: 20, model: gemini-2.5-flash\nPlease retry in 8.997644435s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@
+type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'h
+ttps://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violati
+ons': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateReq
+uestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.5-flash'}, 'quota
+Value': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '8s'}]}} �� mock fallback
+INFO:     127.0.0.1:11303 - "POST /api/insight/market HTTP/1.1" 200 OK
+2026-05-10 20:11:51,606 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini
+-2.5-flash:generateContent "HTTP/1.1 429 Too Many Requests"
+2026-05-10 20:11:51,606 [WARNING] services.gemini: Market Gemini call failed: 429 RESOURCE_EXHAUSTED. {'error': {'code'
+: 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on
+ this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https:
+//ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_reques
+ts, limit: 20, model: gemini-2.5-flash\nPlease retry in 8.661527128s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@
+type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'h
+ttps://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violati
+ons': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateReq
+uestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.5-flash'}, 'quota
+Value': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '8s'}]}} �� mock fallback
+INFO:     127.0.0.1:8066 - "POST /api/insight/market HTTP/1.1" 200 OK
+2026-05-10 20:11:51,621 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini
+-2.5-flash:generateContent "HTTP/1.1 429 Too Many Requests"
+2026-05-10 20:11:51,621 [WARNING] services.gemini: Market Gemini call failed: 429 RESOURCE_EXHAUSTED. {'error': {'code'
+: 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on
+ this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https:
+//ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_reques
+ts, limit: 20, model: gemini-2.5-flash\nPlease retry in 8.677374443s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@
+type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'h
+ttps://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violati
+ons': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateReq
+uestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.5-flash', 'location': 'global'}, 'quota
+Value': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '8s'}]}} �� mock fallback
+INFO:     127.0.0.1:2916 - "POST /api/insight/market HTTP/1.1" 200 OK
+INFO:     127.0.0.1:4062 - "GET /api/market/macro HTTP/1.1" 200 OK
+2026-05-10 20:11:52,069 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+INFO:     127.0.0.1:4859 - "GET /api/stock/list HTTP/1.1" 200 OK
+2026-05-10 20:11:52,453 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini
+-2.5-flash:generateContent "HTTP/1.1 429 Too Many Requests"
+2026-05-10 20:11:52,454 [WARNING] services.gemini: Market Gemini call failed: 429 RESOURCE_EXHAUSTED. {'error': {'code'
+: 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on
+ this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https:
+//ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_reques
+ts, limit: 20, model: gemini-2.5-flash\nPlease retry in 7.805049026s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@
+type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'h
+ttps://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violati
+ons': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateReq
+uestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.5-flash'}, 'quota
+Value': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '7s'}]}} �� mock fallback
+INFO:     127.0.0.1:4062 - "POST /api/insight/market HTTP/1.1" 200 OK
+INFO:     127.0.0.1:8392 - "GET /api/stock/005930/ohlcv?period=3m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5998 - "GET /api/stock/005930/silhouette HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5998 - "GET /api/stock/005930/ohlcv?period=3m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5998 - "GET /api/stock/005930/silhouette HTTP/1.1" 200 OK
+2026-05-10 20:11:59,376 [INFO] services.data_collector: KR stock ohlcv using date: 20260508
+INFO:     127.0.0.1:12847 - "GET /api/stock/list HTTP/1.1" 200 OK
+2026-05-10 20:12:03,537 [INFO] services.data_collector: supply live OK: 005930 10��
+2026-05-10 20:12:04,492 [INFO] services.data_collector: KR stock ohlcv using date: 20260508
+2026-05-10 20:12:05,211 [INFO] services.data_collector: KR stock ohlcv using date: 20260508
+2026-05-10 20:12:05,912 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+2026-05-10 20:12:06,337 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini
+-2.5-flash:generateContent "HTTP/1.1 429 Too Many Requests"
+2026-05-10 20:12:06,338 [WARNING] services.gemini: Gemini call failed [005930]: 429 RESOURCE_EXHAUSTED. {'error': {'cod
+e': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information 
+on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: http
+s://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requ
+ests, limit: 20, model: gemini-2.5-flash\nPlease retry in 53.957960422s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [
+{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url':
+ 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'viol
+ations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'Generate
+RequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.5-flash'}, 'qu
+otaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '53s'}]}} �� mock fallback
+2026-05-10 20:12:06,736 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+2026-05-10 20:12:07,157 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini
+-2.5-flash:generateContent "HTTP/1.1 429 Too Many Requests"
+2026-05-10 20:12:07,158 [WARNING] services.gemini: Gemini call failed [005930]: 429 RESOURCE_EXHAUSTED. {'error': {'cod
+e': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information 
+on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: http
+s://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requ
+ests, limit: 20, model: gemini-2.5-flash\nPlease retry in 53.127111871s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [
+{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url':
+ 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'viol
+ations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'Generate
+RequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.5-flash'}, 'qu
+otaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '53s'}]}} �� mock fallback
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\site-packages\pykrx\website\comm\util.py", l
+ine 10, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\site-packages\pykrx\website\krx\bond\wrap.py
+", line 92, in get_otc_treasury_yields_by_date
+    df = ��������_���ä�Ǽ��ͷ�().fetch(fromdate, todate, ticker2code[ticker])
+                                                           ~~~~~~~~~~~^^^^^^^^
+KeyError: '����ä 3��'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\logging\__init__.py", line 1110, in emit
+    msg = self.format(record)
+          ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\logging\__init__.py", line 953, in format
+    return fmt.format(record)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\logging\__init__.py", line 687, in format
+    record.message = record.getMessage()
+                     ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\logging\__init__.py", line 377, in getMessag
+e
+    msg = msg % self.args
+          ~~~~^~~~~~~~~~~
+TypeError: not all arguments converted during string formatting
+Call stack:
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\threading.py", line 1002, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\threading.py", line 1045, in _bootstrap_inne
+r
+    self.run()
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\_backends\_asyncio.py", 
+line 976, in run
+    result = context.run(func, *args)
+  File "C:\Users\Administrator\Desktop\test\antproject\backend\routers\market.py", line 26, in fear_greed_kr
+    return get_fear_greed_kr()
+  File "C:\Users\Administrator\Desktop\test\antproject\backend\services\data_collector.py", line 648, in get_fear_greed
+_kr
+    return _with_fallback("fear_greed_kr", _fetch_fear_greed_kr_live, "fear_greed_kr_mock.json")
+  File "C:\Users\Administrator\Desktop\test\antproject\backend\services\data_collector.py", line 117, in _with_fallback
+    data = fetch_fn()
+  File "C:\Users\Administrator\Desktop\test\antproject\backend\services\data_collector.py", line 264, in _fetch_fear_gr
+eed_kr_live
+    df_bond    = bond.get_otc_treasury_yields(from_dt, today, KR_FG_SAFE_ASSET_BOND)
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\site-packages\pykrx\bond\bond.py", line 72, 
+in get_otc_treasury_yields
+    df = krx.bond.get_otc_treasury_yields_by_date(*args)
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\site-packages\pykrx\website\comm\util.py", l
+ine 19, in wrapper
+    logging.info(args, kwargs)
+Message: ('20260110', '20260510', '����ä 3��')
+Arguments: ({},)
+2026-05-10 20:13:12,857 [INFO] root: '����ä 3��'
+2026-05-10 20:13:12,857 [WARNING] services.data_collector: bond fetch failed: '���ͷ�' �� using default 50.0
+Error occurred in get_otc_treasury_yields_by_date: '����ä 3��'
+INFO:     127.0.0.1:11320 - "GET /api/market/fear-greed/kr HTTP/1.1" 200 OK
+2026-05-10 20:13:13,066 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+2026-05-10 20:13:13,089 [INFO] services.data_collector: KR stock ohlcv using date: 20260508
+INFO:     127.0.0.1:4116 - "GET /api/market/indices HTTP/1.1" 200 OK
+2026-05-10 20:13:13,211 [WARNING] services.data_collector: exchange CNY failed: insufficient data
+INFO:     127.0.0.1:7551 - "GET /api/market/exchange HTTP/1.1" 200 OK
+2026-05-10 20:13:13,349 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+2026-05-10 20:13:13,616 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+2026-05-10 20:13:13,658 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini
+-2.5-flash:generateContent "HTTP/1.1 429 Too Many Requests"
+2026-05-10 20:13:13,659 [WARNING] services.gemini: Market Gemini call failed: 429 RESOURCE_EXHAUSTED. {'error': {'code'
+: 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on
+ this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https:
+//ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_reques
+ts, limit: 20, model: gemini-2.5-flash\nPlease retry in 46.638602636s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'
+@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': '
+https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violat
+ions': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRe
+questsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.5-flash'}, 'quot
+aValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '46s'}]}} �� mock fallback
+INFO:     127.0.0.1:10307 - "POST /api/insight/market HTTP/1.1" 200 OK
+2026-05-10 20:13:13,773 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini
+-2.5-flash:generateContent "HTTP/1.1 429 Too Many Requests"
+2026-05-10 20:13:13,773 [WARNING] services.gemini: Market Gemini call failed: 429 RESOURCE_EXHAUSTED. {'error': {'code'
+: 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on
+ this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https:
+//ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_reques
+ts, limit: 20, model: gemini-2.5-flash\nPlease retry in 46.520391039s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'
+@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': '
+https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violat
+ions': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRe
+questsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.5-flash'}, 'quot
+aValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '46s'}]}} �� mock fallback
+INFO:     127.0.0.1:11320 - "POST /api/insight/market HTTP/1.1" 200 OK
+2026-05-10 20:13:13,805 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+2026-05-10 20:13:14,005 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini
+-2.5-flash:generateContent "HTTP/1.1 429 Too Many Requests"
+2026-05-10 20:13:14,005 [WARNING] services.gemini: Market Gemini call failed: 429 RESOURCE_EXHAUSTED. {'error': {'code'
+: 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on
+ this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https:
+//ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_reques
+ts, limit: 20, model: gemini-2.5-flash\nPlease retry in 46.276451218s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'
+@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': '
+https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violat
+ions': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRe
+questsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.5-flash', 'location': 'global'}, 'quot
+aValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '46s'}]}} �� mock fallback
+INFO:     127.0.0.1:4116 - "POST /api/insight/market HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1856 - "GET /api/stock/list HTTP/1.1" 200 OK
+2026-05-10 20:13:14,217 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini
+-2.5-flash:generateContent "HTTP/1.1 429 Too Many Requests"
+2026-05-10 20:13:14,217 [WARNING] services.gemini: Market Gemini call failed: 429 RESOURCE_EXHAUSTED. {'error': {'code'
+: 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on
+ this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https:
+//ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_reques
+ts, limit: 20, model: gemini-2.5-flash\nPlease retry in 46.080391791s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'
+@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': '
+https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violat
+ions': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRe
+questsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.5-flash'}, 'quot
+aValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '46s'}]}} �� mock fallback
+INFO:     127.0.0.1:7551 - "POST /api/insight/market HTTP/1.1" 200 OK
+INFO:     127.0.0.1:10632 - "OPTIONS /api/insight/market HTTP/1.1" 200 OK
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\site-packages\pykrx\website\comm\util.py", l
+ine 10, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\site-packages\pykrx\website\krx\bond\wrap.py
+", line 92, in get_otc_treasury_yields_by_date
+    df = ��������_���ä�Ǽ��ͷ�().fetch(fromdate, todate, ticker2code[ticker])
+                                                           ~~~~~~~~~~~^^^^^^^^
+KeyError: '����ä 3��'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\logging\__init__.py", line 1110, in emit
+    msg = self.format(record)
+          ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\logging\__init__.py", line 953, in format
+    return fmt.format(record)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\logging\__init__.py", line 687, in format
+    record.message = record.getMessage()
+                     ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\logging\__init__.py", line 377, in getMessag
+e
+    msg = msg % self.args
+          ~~~~^~~~~~~~~~~
+TypeError: not all arguments converted during string formatting
+Call stack:
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\threading.py", line 1002, in _bootstrap
+    self._bootstrap_inner()
+Error occurred in get_otc_treasury_yields_by_date: '����ä 3��'
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\threading.py", line 1045, in _bootstrap_inne
+r
+    self.run()
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\_backends\_asyncio.py", 
+line 976, in run
+    result = context.run(func, *args)
+  File "C:\Users\Administrator\Desktop\test\antproject\backend\routers\market.py", line 26, in fear_greed_kr
+    return get_fear_greed_kr()
+  File "C:\Users\Administrator\Desktop\test\antproject\backend\services\data_collector.py", line 648, in get_fear_greed
+_kr
+    return _with_fallback("fear_greed_kr", _fetch_fear_greed_kr_live, "fear_greed_kr_mock.json")
+  File "C:\Users\Administrator\Desktop\test\antproject\backend\services\data_collector.py", line 117, in _with_fallback
+    data = fetch_fn()
+  File "C:\Users\Administrator\Desktop\test\antproject\backend\services\data_collector.py", line 264, in _fetch_fear_gr
+eed_kr_live
+    df_bond    = bond.get_otc_treasury_yields(from_dt, today, KR_FG_SAFE_ASSET_BOND)
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\site-packages\pykrx\bond\bond.py", line 72, 
+in get_otc_treasury_yields
+    df = krx.bond.get_otc_treasury_yields_by_date(*args)
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\site-packages\pykrx\website\comm\util.py", l
+ine 19, in wrapper
+    logging.info(args, kwargs)
+Message: ('20260110', '20260510', '����ä 3��')
+Arguments: ({},)
+2026-05-10 20:13:24,268 [INFO] root: '����ä 3��'
+2026-05-10 20:13:24,268 [WARNING] services.data_collector: bond fetch failed: '���ͷ�' �� using default 50.0
+INFO:     127.0.0.1:14258 - "GET /api/market/fear-greed/kr HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14258 - "OPTIONS /api/insight/market HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13379 - "GET /api/market/indices HTTP/1.1" 200 OK
+2026-05-10 20:13:24,546 [WARNING] services.data_collector: exchange CNY failed: insufficient data
+INFO:     127.0.0.1:6234 - "GET /api/market/exchange HTTP/1.1" 200 OK
+2026-05-10 20:13:24,693 [INFO] services.data_collector: KR stock ohlcv using date: 20260508
+2026-05-10 20:13:24,907 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+2026-05-10 20:13:25,029 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+2026-05-10 20:13:25,166 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+2026-05-10 20:13:25,307 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+2026-05-10 20:13:25,310 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini
+-2.5-flash:generateContent "HTTP/1.1 429 Too Many Requests"
+2026-05-10 20:13:25,310 [WARNING] services.gemini: Market Gemini call failed: 429 RESOURCE_EXHAUSTED. {'error': {'code'
+: 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on
+ this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https:
+//ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_reques
+ts, limit: 20, model: gemini-2.5-flash\nPlease retry in 34.963251822s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'
+@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': '
+https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violat
+ions': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRe
+questsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.5-flash'}, 'quot
+aValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '34s'}]}} �� mock fallback
+INFO:     127.0.0.1:14258 - "POST /api/insight/market HTTP/1.1" 200 OK
+2026-05-10 20:13:25,450 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini
+-2.5-flash:generateContent "HTTP/1.1 429 Too Many Requests"
+2026-05-10 20:13:25,450 [WARNING] services.gemini: Market Gemini call failed: 429 RESOURCE_EXHAUSTED. {'error': {'code'
+: 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on
+ this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https:
+//ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_reques
+ts, limit: 20, model: gemini-2.5-flash\nPlease retry in 34.838782814s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'
+@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': '
+https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violat
+ions': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRe
+questsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.5-flash', 'location': 'global'}, 'quot
+aValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '34s'}]}} �� mock fallback
+INFO:     127.0.0.1:11511 - "POST /api/insight/market HTTP/1.1" 200 OK
+2026-05-10 20:13:25,565 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini
+-2.5-flash:generateContent "HTTP/1.1 429 Too Many Requests"
+2026-05-10 20:13:25,565 [WARNING] services.gemini: Market Gemini call failed: 429 RESOURCE_EXHAUSTED. {'error': {'code'
+: 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on
+ this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https:
+//ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_reques
+ts, limit: 20, model: gemini-2.5-flash\nPlease retry in 34.721594181s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'
+@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': '
+https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violat
+ions': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRe
+questsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.5-flash'}, 'quot
+aValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '34s'}]}} �� mock fallback
+INFO:     127.0.0.1:13379 - "POST /api/insight/market HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13961 - "GET /api/stock/list HTTP/1.1" 200 OK
+2026-05-10 20:13:25,733 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini
+-2.5-flash:generateContent "HTTP/1.1 429 Too Many Requests"
+2026-05-10 20:13:25,733 [WARNING] services.gemini: Market Gemini call failed: 429 RESOURCE_EXHAUSTED. {'error': {'code'
+: 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on
+ this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https:
+//ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_reques
+ts, limit: 20, model: gemini-2.5-flash\nPlease retry in 34.563982149s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'
+@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': '
+https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violat
+ions': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRe
+questsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.5-flash'}, 'quot
+aValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '34s'}]}} �� mock fallback
+INFO:     127.0.0.1:6234 - "POST /api/insight/market HTTP/1.1" 200 OK
+INFO:     127.0.0.1:12126 - "GET /api/market/macro HTTP/1.1" 200 OK
+2026-05-10 20:13:26,741 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+2026-05-10 20:13:27,157 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini
+-2.5-flash:generateContent "HTTP/1.1 429 Too Many Requests"
+2026-05-10 20:13:27,158 [WARNING] services.gemini: Market Gemini call failed: 429 RESOURCE_EXHAUSTED. {'error': {'code'
+: 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on
+ this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https:
+//ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_reques
+ts, limit: 20, model: gemini-2.5-flash\nPlease retry in 33.142561876s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'
+@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': '
+https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violat
+ions': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRe
+questsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.5-flash', 'location': 'global'}, 'quot
+aValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '33s'}]}} �� mock fallback
+INFO:     127.0.0.1:12126 - "POST /api/insight/market HTTP/1.1" 200 OK
+2026-05-10 20:13:33,848 [INFO] services.data_collector: KR stock ohlcv using date: 20260508
+INFO:     127.0.0.1:4863 - "GET /api/stock/list HTTP/1.1" 200 OK
+INFO:     127.0.0.1:8136 - "GET /api/stock/005930/valuation HTTP/1.1" 200 OK
+INFO:     127.0.0.1:7189 - "GET /api/stock/005930/supply HTTP/1.1" 200 OK
+INFO:     127.0.0.1:3109 - "GET /api/stock/005930/ohlcv?period=3m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:7189 - "GET /api/stock/005930/valuation HTTP/1.1" 200 OK
+INFO:     127.0.0.1:3109 - "GET /api/stock/005930/supply HTTP/1.1" 200 OK
+INFO:     127.0.0.1:8136 - "GET /api/stock/005930/silhouette HTTP/1.1" 200 OK
+INFO:     127.0.0.1:7189 - "GET /api/stock/005930/ohlcv?period=3m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:3109 - "GET /api/stock/005930/silhouette HTTP/1.1" 200 OK
+2026-05-10 20:14:20,076 [INFO] services.data_collector: KR stock ohlcv using date: 20260508
+2026-05-10 20:14:20,350 [INFO] services.data_collector: KR stock ohlcv using date: 20260508
+2026-05-10 20:14:20,367 [INFO] services.data_collector: KR stock ohlcv using date: 20260508
+INFO:     127.0.0.1:4085 - "GET /api/stock/list HTTP/1.1" 200 OK
+2026-05-10 20:14:21,888 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+2026-05-10 20:14:22,002 [INFO] google_genai.models: AFC is enabled with max remote calls: 10.
+2026-05-10 20:14:22,493 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini
+-2.5-flash:generateContent "HTTP/1.1 429 Too Many Requests"
+2026-05-10 20:14:22,494 [WARNING] services.gemini: Gemini call failed [005930]: 429 RESOURCE_EXHAUSTED. {'error': {'cod
+e': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information 
+on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: http
+s://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requ
+ests, limit: 20, model: gemini-2.5-flash\nPlease retry in 37.795646853s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [
+{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url':
+ 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'viol
+ations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'Generate
+RequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.5-flash'}, 'qu
+otaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '37s'}]}} �� mock fallback
+INFO:     127.0.0.1:12218 - "POST /api/insight/005930 HTTP/1.1" 200 OK
+2026-05-10 20:14:22,501 [INFO] httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini
+-2.5-flash:generateContent "HTTP/1.1 429 Too Many Requests"
+2026-05-10 20:14:22,502 [WARNING] services.gemini: Gemini call failed [005930]: 429 RESOURCE_EXHAUSTED. {'error': {'cod
+e': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information 
+on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: http
+s://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requ
+ests, limit: 20, model: gemini-2.5-flash\nPlease retry in 37.794987132s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [
+{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url':
+ 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'viol
+ations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'Generate
+RequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.5-flash', 'location': 'global'}, 'qu
+otaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '37s'}]}} �� mock fallback
+INFO:     127.0.0.1:13191 - "POST /api/insight/005930 HTTP/1.1" 200 OK

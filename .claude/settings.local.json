@@ -20,7 +20,14 @@
       "PowerShell(Invoke-RestMethod -Uri \"http://localhost:8000/api/stock/005930/supply\" -Method GET | ConvertTo-Json -Depth 5)",
       "PowerShell(Invoke-RestMethod -Uri \"http://localhost:8000/api/insight/005930\" -Method POST | ConvertTo-Json -Depth 3)",
       "Bash(Get-ChildItem *)",
-      "Bash(python *)"
+      "Bash(python *)",
+      "Bash(Test-Path \"c:\\\\Users\\\\Administrator\\\\Desktop\\\\test\\\\antproject\\\\backend\\\\.env\")",
+      "PowerShell(Invoke-RestMethod -Uri \"http://localhost:8000/api/health\")",
+      "PowerShell(Invoke-RestMethod -Uri \"http://localhost:8000/api/market/indices\")",
+      "PowerShell(Get-Process -Name \"python\" -ErrorAction SilentlyContinue)",
+      "PowerShell(Stop-Process -Force)",
+      "PowerShell(Get-Process -Name \"node\" -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Process -Name \"python\",\"node\" -ErrorAction SilentlyContinue)"
     ]
   }
 }
