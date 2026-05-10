@@ -13,14 +13,34 @@ prefix: /api/insight  (main.py include_router에서 부여)
     5. gemini.get_insight(code, stock_data) 호출
 """
 import logging
+from typing import Any
 
 import pandas as pd
 from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 
 from services import data_collector, gemini, indicator, silhouette
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
+
+
+# ── POST /market ──────────────────────────────────────────────────────────
+
+class MarketInsightRequest(BaseModel):
+    indices: list[dict[str, Any]] = []
+    fear_greed_kr: dict[str, Any] = {}
+    fear_greed_us: dict[str, Any] = {}
+    buffett: dict[str, Any] = {}
+
+
+@router.post("/market")
+def post_market_insight(req: MarketInsightRequest):
+    """
+    시장 전반 컨텍스트를 Gemini에 전달해 .plain-help 용 한국어 설명 3종 반환.
+    30분 캐시 적용 (gemini.py 내부).
+    """
+    return gemini.get_market_insight(req.model_dump())
 
 
 # ── POST /{code} ──────────────────────────────────────────────────────────

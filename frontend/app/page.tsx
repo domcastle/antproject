@@ -6,7 +6,7 @@ import {
   STOCKS, MARKET_INDICES, FEAR_GREED, BUFFETT, CALENDAR_EVENTS,
   calcSilhouetteZone,
 } from '@/lib/mockData';
-import { fetchStockList, SWR_POLL } from '@/lib/api';
+import { fetchStockList, fetchMarketInsight, SWR_POLL } from '@/lib/api';
 import Sidebar from '@/components/Sidebar';
 import ExchangeTicker from '@/components/ExchangeTicker';
 import FearGreedGauge from '@/components/FearGreedGauge';
@@ -40,6 +40,12 @@ export default function HomePage() {
   const [yfIndices, setYfIndices] = useState<Record<string, any>>({});
   const [apiIndices, setApiIndices] = useState<Record<string, any>>({});
   const [apiMacro, setApiMacro] = useState<{ buffett_index?: number; m7_betas: any[] } | null>(null);
+  const [marketInsight, setMarketInsight] = useState<{
+    indices_summary: string;
+    fear_greed_kr: string;
+    fear_greed_us: string;
+    buffett: string;
+  } | null>(null);
 
   const { data: stockListRaw } = useSWR<any[]>(
     'stock-list', () => fetchStockList().then(r => r.json()), SWR_POLL,
@@ -73,6 +79,30 @@ export default function HomePage() {
       if (d.m7_betas) setApiMacro(d);
     }).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    const fgKR  = liveFearGreedKR ?? MOCK_FEAR_GREED_KR;
+    const fgUS  = liveFearGreedUS ?? { score: FEAR_GREED.value, status: 'greed' };
+    const bVal  = apiMacro?.buffett_index ?? BUFFETT.us;
+    const bStat = bVal >= 150 ? 'bubble' : bVal >= 100 ? 'overvalued' : bVal >= 70 ? 'neutral' : 'undervalued';
+    const idxPayload = MARKET_INDICES.map(idx => {
+      const api = (apiIndices as any)[idx.name];
+      return {
+        name: idx.name,
+        value: api?.current ?? idx.value,
+        change_pct: api?.change_pct ?? idx.changePct,
+      };
+    });
+    fetchMarketInsight({
+      indices: idxPayload,
+      fear_greed_kr: { score: (fgKR as any).score ?? 50, status: (fgKR as any).status ?? '' },
+      fear_greed_us: { score: (fgUS as any).score ?? (fgUS as any).value ?? 50, status: (fgUS as any).status ?? (fgUS as any).label ?? '' },
+      buffett: { value: bVal, status: bStat },
+    })
+      .then(r => r.json())
+      .then(d => { if (d.indices_summary) setMarketInsight(d); })
+      .catch(() => {});
+  }, [liveFearGreedKR, liveFearGreedUS, apiMacro, apiIndices]);
 
   const mergedIndices = MARKET_INDICES.map(idx => {
     const api = apiIndices[idx.name];
@@ -182,7 +212,10 @@ export default function HomePage() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
             {mergedIndices.map(idx => <IndexCard key={idx.name} idx={idx} />)}
           </div>
-          <div className="plain-help mb-8">{indicesHelpText}</div>
+          {marketInsight?.indices_summary
+            ? <div className="plain-help mb-8" dangerouslySetInnerHTML={{ __html: marketInsight.indices_summary }} />
+            : <div className="plain-help mb-8">{indicesHelpText}</div>
+          }
 
           {/* Fear & Greed + Buffett */}
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-8">

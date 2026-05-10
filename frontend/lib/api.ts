@@ -19,6 +19,17 @@ export const fetchSupply    = (code: string) => fetch(`${BASE}/api/stock/${code}
 export const fetchValuation = (code: string) => fetch(`${BASE}/api/stock/${code}/valuation`);
 export const fetchInsight   = (code: string) =>
   fetch(`${BASE}/api/insight/${code}`, { method: "POST" });
+export const fetchMarketInsight = (body: {
+  indices: { name: string; value: number; change_pct: number }[];
+  fear_greed_kr: { score: number; status: string };
+  fear_greed_us: { score: number; status: string };
+  buffett: { value: number; status: string };
+}) =>
+  fetch(`${BASE}/api/insight/market`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
 export const fetchCalendar  = (year: number, month: number) =>
   fetch(`${BASE}/api/calendar?year=${year}&month=${month}`);
 
