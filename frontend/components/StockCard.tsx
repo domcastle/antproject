@@ -16,10 +16,12 @@ export default function StockCard({ stock }: { stock: MergedStock }) {
     code, name, market, price, change, changePct,
     per, pbr, silhouetteZone, silhouetteSignal, silhouettePct,
   } = stock;
-  const isUp = changePct >= 0;
-  const zoneColor = (SILHOUETTE_COLORS as Record<number, string>)[silhouetteZone] ?? '#8B95A1';
+  const isUp      = changePct >= 0;
+  const zoneColor = (SILHOUETTE_COLORS as Record<number, string>)[silhouetteZone] ?? '#7e8a9c';
+  const upColor   = 'var(--up)';
+  const downColor = 'var(--down)';
 
-  const priceStr = market === 'KR'
+  const priceStr  = market === 'KR'
     ? price.toLocaleString('ko-KR')
     : `$${price.toFixed(2)}`;
   const changeStr = market === 'KR'
@@ -27,41 +29,67 @@ export default function StockCard({ stock }: { stock: MergedStock }) {
     : `${isUp ? '+' : ''}${change.toFixed(2)}`;
 
   return (
-    <Link href={`/stock/${code}`} className="block">
+    <Link href={`/stock/${code}`} style={{ display: 'block', textDecoration: 'none' }}>
       <div
-        className="relative bg-[#0f1117] border border-[#1e2330] rounded-xl p-4 cursor-pointer transition-colors hover:border-[#3182f6]/50"
+        style={{
+          position: 'relative',
+          background: 'var(--surface)',
+          border: `1px solid ${hovered ? 'var(--accent)' : 'var(--line)'}`,
+          borderRadius: 12, padding: 14, cursor: 'pointer',
+          transition: 'border-color 0.12s',
+        }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        <div className="flex items-start justify-between mb-2">
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8 }}>
           <div>
-            <div className="text-xs font-bold text-white">{name}</div>
-            <div className="text-[10px] text-gray-500">{code} · {market}</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--fg)' }}>{name}</div>
+            <div style={{ fontSize: 10, color: 'var(--fg-3)', marginTop: 1 }}>{code} · {market}</div>
           </div>
-          <div className="w-2.5 h-2.5 rounded-full mt-0.5 flex-shrink-0" style={{ backgroundColor: zoneColor }} />
+          <div style={{
+            width: 9, height: 9, borderRadius: '50%',
+            background: zoneColor, flexShrink: 0, marginTop: 2,
+          }} />
         </div>
-        <div className="mb-2">
-          <div className="text-sm font-bold text-white">{priceStr}</div>
-          <div className="text-xs font-medium" style={{ color: isUp ? '#FF4D4D' : '#3182F6' }}>
+
+        <div style={{ marginBottom: 8 }}>
+          <div style={{
+            fontSize: 14, fontWeight: 700, color: 'var(--fg)',
+            fontFamily: "'IBM Plex Mono', monospace",
+          }}>
+            {priceStr}
+          </div>
+          <div style={{
+            fontSize: 11, fontWeight: 600, marginTop: 1,
+            color: isUp ? upColor : downColor,
+            fontFamily: "'IBM Plex Mono', monospace",
+          }}>
             {changeStr} ({isUp ? '+' : ''}{changePct.toFixed(2)}%)
           </div>
         </div>
-        <div className="flex gap-3 text-[9px] text-gray-500">
-          {per  !== null && <span>PER {per}</span>}
-          {pbr  !== null && <span>PBR {pbr}</span>}
+
+        <div style={{ display: 'flex', gap: 10, fontSize: 9, color: 'var(--fg-3)' }}>
+          {per !== null && <span>PER {per}</span>}
+          {pbr !== null && <span>PBR {pbr}</span>}
         </div>
 
-        {/* Hover 실루엣 패널 */}
-        <div
-          className={`absolute left-full top-0 ml-2 z-50 transition-all duration-300 ${
-            hovered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-2 pointer-events-none'
-          }`}
-          style={{ width: '140px' }}
-        >
-          <div className="bg-[#0f1117] border border-[#1e2330] rounded-xl p-3 shadow-xl">
-            <div className="text-[10px] text-gray-400 mb-2">실루엣 위치</div>
-            <div className="relative h-28 flex items-center justify-center mb-2">
-              <svg viewBox="0 0 40 100" className="h-24 opacity-20" fill="#8B95A1">
+        {/* Hover silhouette panel */}
+        <div style={{
+          position: 'absolute', left: '100%', top: 0, marginLeft: 8, zIndex: 50,
+          width: 130, transition: 'all 0.2s',
+          opacity: hovered ? 1 : 0,
+          transform: hovered ? 'translateX(0)' : 'translateX(-6px)',
+          pointerEvents: hovered ? 'auto' : 'none',
+        }}>
+          <div style={{
+            background: 'var(--surface-2)',
+            border: '1px solid var(--line-2)',
+            borderRadius: 10, padding: 10,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+          }}>
+            <div style={{ fontSize: 9, color: 'var(--fg-3)', marginBottom: 8 }}>실루엣 위치</div>
+            <div style={{ position: 'relative', height: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 6 }}>
+              <svg viewBox="0 0 40 100" style={{ height: 90, opacity: 0.15 }} fill="var(--fg-3)">
                 <ellipse cx="20" cy="8"  rx="6" ry="6" />
                 <rect x="13" y="15" width="14" height="30" rx="3" />
                 <rect x="6"  y="16" width="7"  height="22" rx="3" />
@@ -69,20 +97,26 @@ export default function StockCard({ stock }: { stock: MergedStock }) {
                 <rect x="13" y="45" width="6"  height="30" rx="3" />
                 <rect x="21" y="45" width="6"  height="30" rx="3" />
               </svg>
-              <div
-                className="absolute w-3 h-3 rounded-full border-2 border-white animate-pulse"
-                style={{
-                  backgroundColor: zoneColor,
-                  top: `${100 - silhouettePct}%`,
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                }}
-              />
+              <div style={{
+                position: 'absolute',
+                width: 10, height: 10, borderRadius: '50%',
+                background: zoneColor,
+                border: '2px solid rgba(255,255,255,0.8)',
+                top: `${100 - silhouettePct}%`,
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                boxShadow: `0 0 8px ${zoneColor}80`,
+              }} />
             </div>
-            <div className="text-[10px] font-semibold text-center" style={{ color: zoneColor }}>
+            <div style={{
+              fontSize: 10, fontWeight: 700, textAlign: 'center',
+              color: zoneColor, marginBottom: 2,
+            }}>
               {silhouetteSignal}
             </div>
-            <div className="text-[9px] text-gray-500 text-center">{silhouettePct}% 구간</div>
+            <div style={{ fontSize: 9, color: 'var(--fg-3)', textAlign: 'center' }}>
+              {silhouettePct}% 구간
+            </div>
           </div>
         </div>
       </div>

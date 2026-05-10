@@ -7,6 +7,7 @@ main.py — FastAPI 앱 진입점
 import logging
 import os
 from contextlib import asynccontextmanager
+
 from datetime import datetime, timezone
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler

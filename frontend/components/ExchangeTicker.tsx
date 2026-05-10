@@ -1,89 +1,48 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { fetchExchange } from '@/lib/api';
 
-interface ExchangeRate {
-  currency: string;
-  label: string;
-  rate: number;
-  change: number;
-  change_pct: number;
-  direction: 'up' | 'down' | 'flat';
-}
-
-const MOCK_RATES: ExchangeRate[] = [
-  { currency: 'USD', label: '달러',   rate: 1379.5,  change: -5.1,  change_pct: -0.37, direction: 'down' },
-  { currency: 'EUR', label: '유로',   rate: 1521.3,  change:  2.3,  change_pct:  0.15, direction: 'up'   },
-  { currency: 'JPY', label: '엔',     rate:    9.21, change: -0.05, change_pct: -0.54, direction: 'down' },
-  { currency: 'CNY', label: '위안',   rate:  190.4,  change:  0.2,  change_pct:  0.11, direction: 'up'   },
-  { currency: 'GBP', label: '파운드', rate: 1751.8,  change: -8.2,  change_pct: -0.47, direction: 'down' },
+const MOCK = [
+  { currency: 'USD', label: '달러',   rate: 1378.5, change: 4.2,  change_pct: 0.31, direction: 'up' },
+  { currency: 'EUR', label: '유로',   rate: 1492.1, change: -2.1, change_pct: -0.14, direction: 'down' },
+  { currency: 'JPY', label: '엔',    rate: 906.4,  change: 0.8,  change_pct: 0.09, direction: 'up' },
+  { currency: 'CNY', label: '위안',   rate: 192.3,  change: 0.0,  change_pct: 0.00, direction: 'flat' },
+  { currency: 'GBP', label: '파운드', rate: 1741.2, change: -5.8, change_pct: -0.33, direction: 'down' },
 ];
 
-function formatRate(r: ExchangeRate) {
-  const arrow    = r.direction === 'up' ? '▲' : r.direction === 'down' ? '▼' : '—';
-  const sign     = r.change >= 0 ? '+' : '';
-  const color    = r.direction === 'up' ? '#FF4D4D' : r.direction === 'down' ? '#3182F6' : '#8B95A1';
-  const rateStr  = r.rate < 100
-    ? r.rate.toFixed(2)
-    : r.rate.toLocaleString('ko-KR', { maximumFractionDigits: 2 });
-  return { arrow, sign, color, rateStr };
-}
-
 export default function ExchangeTicker() {
-  const [rates, setRates] = useState<ExchangeRate[]>(MOCK_RATES);
-
+  const [rates, setRates] = useState(MOCK);
   useEffect(() => {
-    const base = process.env.NEXT_PUBLIC_API_URL;
-    if (!base) return;
-
-    const load = () =>
-      fetch(`${base}/api/market/exchange`)
-        .then(r => r.json())
-        .then((data: ExchangeRate[]) => {
-          if (Array.isArray(data) && data.length > 0) setRates(data);
-        })
-        .catch(() => {});
-
-    load();
-    const id = setInterval(load, 900_000);
-    return () => clearInterval(id);
+    fetchExchange().then(r => r.json()).then(d => {
+      const list = Array.isArray(d) ? d : d?.rates;
+      if (Array.isArray(list) && list.length) setRates(list);
+    }).catch(() => {});
   }, []);
-
-  // 심리스 루프: 아이템 2벌 복사
   const items = [...rates, ...rates];
-
   return (
-    <div className="bg-[#06080f] border-b border-[#1e2330] overflow-hidden py-1.5 select-none">
-      <style>{`
-        @keyframes ticker-scroll {
-          0%   { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        .ticker-track {
-          display: flex;
-          gap: 2.5rem;
-          white-space: nowrap;
-          animation: ticker-scroll 35s linear infinite;
-        }
-        .ticker-track:hover {
-          animation-play-state: paused;
-        }
-      `}</style>
-
-      <div className="ticker-track">
-        {items.map((r, i) => {
-          const { arrow, sign, color, rateStr } = formatRate(r);
-          return (
-            <span key={i} className="inline-flex items-center gap-1.5 text-xs flex-shrink-0">
-              <span className="text-gray-500">{r.label}</span>
-              <span className="text-white font-medium">{rateStr}</span>
-              <span style={{ color }} className="font-medium tabular-nums">
-                {sign}{Math.abs(r.change).toFixed(2)}&nbsp;
-                ({sign}{Math.abs(r.change_pct).toFixed(2)}%){arrow}
-              </span>
-              <span className="text-[#1e2330] mx-1">|</span>
-            </span>
-          );
-        })}
+    <div className="border-b border-line bg-bg overflow-hidden">
+      <div className="flex items-center">
+        <div className="px-4 py-2 bg-bg-2 border-r border-line text-[10px] tracking-[0.18em] uppercase text-accent font-mono shrink-0">
+          ◉ 환율
+        </div>
+        <div className="overflow-hidden flex-1">
+          <div className="ticker-track">
+            {items.map((r, i) => {
+              const up = r.direction === 'up';
+              const flat = r.direction === 'flat';
+              const c = flat ? '#aab2bf' : up ? '#ff5b5b' : '#4a90ff';
+              return (
+                <div key={i} className="flex items-center gap-3 px-6 py-2 border-r border-line/50 shrink-0">
+                  <span className="text-[11px] text-fg-2 w-12">{r.label}</span>
+                  <span className="num text-sm text-fg">{r.rate.toLocaleString('ko-KR', { minimumFractionDigits: 1, maximumFractionDigits: 2 })}</span>
+                  <span className="num text-[11px]" style={{ color: c }}>
+                    {up ? '▲' : flat ? '–' : '▼'} {Math.abs(r.change).toFixed(2)} ({Math.abs(r.change_pct).toFixed(2)}%)
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
   );

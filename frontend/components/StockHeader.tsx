@@ -1,92 +1,48 @@
-"use client";
+'use client';
+import Link from 'next/link';
+import type { StockData } from '@/lib/mockData';
 
-import useSWR from "swr";
-import { fetchStockList, SWR_POLL } from "@/lib/api";
-import { SILHOUETTE_COLORS } from "@/lib/constants";
-import type { StockListItem } from "@/lib/types";
-
-const ZONE_LABEL: Record<number, string> = {
-  1: "발목", 2: "무릎", 3: "허리", 4: "어깨", 5: "머리",
+const ZONE_META: Record<number, { label: string; color: string }> = {
+  1: { label: '발목', color: '#4ade80' },
+  2: { label: '종아리', color: '#86d96d' },
+  3: { label: '허리', color: '#c8a464' },
+  4: { label: '어깨', color: '#f5a623' },
+  5: { label: '머리', color: '#ff5b5b' },
 };
 
-interface Props { code: string }
-
-export function StockHeader({ code }: Props) {
-  const { data } = useSWR<StockListItem[]>(
-    "stock-list",
-    () => fetchStockList().then(r => r.json()),
-    { ...SWR_POLL, revalidateOnFocus: false },
-  );
-
-  const stock = data?.find(s => s.code === code);
-  const isUp  = (stock?.change_pct ?? 0) > 0;
-  const isFlat = (stock?.change_pct ?? 0) === 0;
-
-  // Korean convention: up = red, down = blue
-  const changeColor = isFlat ? "#8b95a1" : isUp ? "#ef5350" : "#3b82f6";
-  const changeArrow = isFlat ? "–" : isUp ? "▲" : "▼";
-
-  const priceStr = stock
-    ? stock.market === "KR"
-      ? `${stock.price.toLocaleString()}원`
-      : `$${stock.price.toLocaleString()}`
-    : null;
-
-  const zoneColor = stock ? SILHOUETTE_COLORS[stock.zone] : "#8b95a1";
-
+export default function StockHeader({
+  stock, onBack,
+}: {
+  stock: StockData & { silhouetteZone?: number };
+  onBack?: () => void;
+}) {
+  const up = stock.changePct >= 0;
+  const c = up ? '#ff5b5b' : '#4a90ff';
+  const zone = ZONE_META[stock.silhouetteZone ?? 3] ?? ZONE_META[3];
   return (
-    <div className="border-b border-gray-800/50 bg-[#131722] px-4 py-4">
-      <div className="mx-auto max-w-5xl flex items-start justify-between gap-4">
-
-        {/* Left: name + price */}
-        <div>
-          <div className="flex flex-wrap items-center gap-2">
-            {stock ? (
-              <h1 className="text-xl font-bold text-white">{stock.name}</h1>
-            ) : (
-              <div className="h-7 w-36 animate-pulse rounded bg-gray-800" />
-            )}
-            <span className="text-sm text-gray-500">{code}</span>
-            {stock && (
-              <span className="rounded border border-gray-700 px-1.5 py-0.5 text-[10px] font-medium text-gray-500">
-                {stock.market}
-              </span>
-            )}
-          </div>
-
-          <div className="mt-2 flex items-baseline gap-3">
-            {priceStr ? (
-              <>
-                <span className="text-2xl font-bold tabular-nums text-gray-100">
-                  {priceStr}
-                </span>
-                <span className="text-sm font-medium" style={{ color: changeColor }}>
-                  {changeArrow}&nbsp;{Math.abs(stock!.change_pct).toFixed(2)}%
-                </span>
-              </>
-            ) : (
-              <div className="h-8 w-44 animate-pulse rounded bg-gray-800" />
-            )}
-          </div>
+    <div className="card flex items-center gap-6 mb-4">
+      <Link href="/" className="text-fg-3 hover:text-accent transition-colors text-sm">← 시장 요약</Link>
+      <div className="border-l border-line h-10" />
+      <div>
+        <div className="font-mono text-[10px] tracking-[0.14em] uppercase text-fg-3">
+          {stock.market} · {stock.code}
         </div>
-
-        {/* Right: zone badge */}
-        {stock && (
-          <div
-            className="flex-shrink-0 rounded-lg px-3 py-2 text-center"
-            style={{
-              backgroundColor: zoneColor + "18",
-              borderLeft: `3px solid ${zoneColor}`,
-            }}
-          >
-            <p className="text-[10px] text-gray-500">실루엣</p>
-            <p className="mt-0.5 text-base font-bold" style={{ color: zoneColor }}>
-              {ZONE_LABEL[stock.zone]}
-            </p>
-            <p className="text-[10px] text-gray-500">Zone {stock.zone}</p>
-          </div>
-        )}
+        <div className="headline text-2xl text-fg mt-0.5">{stock.name}</div>
       </div>
+      <div className="ml-auto text-right">
+        <div className="num text-3xl text-fg font-semibold">
+          {stock.market === 'KR'
+            ? stock.price.toLocaleString('ko-KR')
+            : `$${stock.price.toFixed(2)}`}
+        </div>
+        <div className="num text-sm" style={{ color: c }}>
+          {up ? '▲' : '▼'} {Math.abs(stock.change)} ({up ? '+' : ''}{stock.changePct.toFixed(2)}%)
+        </div>
+      </div>
+      <span className="px-3 py-1.5 rounded-full border text-xs whitespace-nowrap"
+            style={{ borderColor: zone.color + '55', background: zone.color + '12', color: zone.color }}>
+        ● {zone.label}
+      </span>
     </div>
   );
 }

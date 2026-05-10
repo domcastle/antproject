@@ -323,19 +323,30 @@ def _fetch_stock_list_live() -> list[dict]:
 
     rows = []
 
-    # KR
+    # KR — 최근 5일 역순 탐색으로 가장 최근 거래일 데이터 사용 (휴장일 대응)
     try:
-        df_ohlcv = stock.get_market_ohlcv(today, market="KOSPI")
-        for code in kr_codes:
-            if code in df_ohlcv.index:
-                row = df_ohlcv.loc[code]
-                rows.append({
-                    "code": code, "name": kr_names[code], "market": "KR",
-                    "price": int(row.get("종가", 0)),
-                    "change_pct": round(float(row.get("등락률", 0)), 2),
-                    "volume": int(row.get("거래대금", 0)) // 10000,
-                    "zone": 3,  # silhouette.py가 정밀 계산 — 여기서는 중립값
-                })
+        df_ohlcv = None
+        for delta in range(5):
+            check_date = (datetime.now(timezone.utc) - pd.Timedelta(days=delta)).strftime("%Y%m%d")
+            df_try = stock.get_market_ohlcv(check_date, market="KOSPI")
+            if not df_try.empty and df_try["종가"].sum() > 0:
+                df_ohlcv = df_try
+                logger.info(f"KR stock ohlcv using date: {check_date}")
+                break
+        if df_ohlcv is not None:
+            for code in kr_codes:
+                if code in df_ohlcv.index:
+                    row = df_ohlcv.loc[code]
+                    price = int(row.get("종가", 0))
+                    if price == 0:
+                        continue
+                    rows.append({
+                        "code": code, "name": kr_names[code], "market": "KR",
+                        "price": price,
+                        "change_pct": round(float(row.get("등락률", 0)), 2),
+                        "volume": int(row.get("거래대금", 0)) // 10000,
+                        "zone": 3,
+                    })
     except Exception as e:
         logger.warning(f"KR stock list fetch failed: {e}")
 

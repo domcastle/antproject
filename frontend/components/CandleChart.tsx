@@ -1,398 +1,123 @@
-"use client";
+'use client';
+import { useEffect, useState } from 'react';
+import { fetchOhlcv } from '@/lib/api';
 
-import React, { useState, useMemo, useCallback } from "react";
-import {
-  ComposedChart, Bar, Line, Area,
-  XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, Cell,
-} from "recharts";
-import useSWR from "swr";
-import { fetchOhlcv, SWR_POLL } from "@/lib/api";
-import type { OhlcvItem } from "@/lib/types";
+interface Candle { date: string; open: number; high: number; low: number; close: number; ma5?: number; ma20?: number; ma60?: number; ma120?: number; bb_upper?: number; bb_lower?: number; }
 
-// ── Local types ────────────────────────────────────────────────────────
-type Period = "3mo" | "6mo" | "1y";
-type MaKey  = "ma5" | "ma20" | "ma60" | "ma120";
+const MA_COLORS: Record<string, string> = { ma5: '#c8a464', ma20: '#42a5f5', ma60: '#f5a623', ma120: '#ff5b5b' };
 
-type EnrichedItem = OhlcvItem & { bb_band?: number };
+export default function CandleChart({ code }: { code: string }) {
+  const [data, setData] = useState<Candle[]>([]);
+  const [period, setPeriod] = useState('3m');
+  const [showMA, setShowMA] = useState({ ma5: true, ma20: true, ma60: true, ma120: false });
+  const [showBB, setShowBB] = useState(false);
 
-// ── Constants ──────────────────────────────────────────────────────────
-const PERIODS: { label: string; value: Period }[] = [
-  { label: "3개월", value: "3mo" },
-  { label: "6개월", value: "6mo" },
-  { label: "1년",   value: "1y"  },
-];
+  useEffect(() => {
+    fetchOhlcv(code, period).then(r => r.json()).then(d => {
+      if (Array.isArray(d) && d.length) setData(d);
+    }).catch(() => {});
+  }, [code, period]);
 
-const MA_CONFIG = [
-  { key: "ma5"  as MaKey, color: "#f59e0b", label: "MA5"   },
-  { key: "ma20" as MaKey, color: "#3b82f6", label: "MA20"  },
-  { key: "ma60" as MaKey, color: "#8b5cf6", label: "MA60"  },
-  { key: "ma120"as MaKey, color: "#ec4899", label: "MA120" },
-] as const;
-
-const UP_CLR = "#26a69a";
-const DN_CLR = "#ef5350";
-const BB_CLR = "#60a5fa";
-
-// ── Tooltip ────────────────────────────────────────────────────────────
-function CandleTooltip({ active, payload }: any) {
-  if (!active || !payload?.length) return null;
-  const d = payload[0]?.payload as EnrichedItem | undefined;
-  if (!d) return null;
-
-  const isUp = d.close >= d.open;
-  const volStr =
-    d.volume >= 1_000_000
-      ? `${(d.volume / 1_000_000).toFixed(1)}M`
-      : `${(d.volume / 1_000).toFixed(0)}K`;
-
-  return (
-    <div className="min-w-[160px] rounded-lg border border-gray-700 bg-[#1e2232] p-3 text-xs shadow-2xl">
-      <p className="mb-1.5 text-[11px] text-gray-500">{d.date}</p>
-      <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-gray-200">
-        <span className="text-gray-500">시가</span>
-        <span>{d.open.toLocaleString()}</span>
-        <span className="text-gray-500">고가</span>
-        <span className="text-[#ef5350]">{d.high.toLocaleString()}</span>
-        <span className="text-gray-500">저가</span>
-        <span className="text-[#26a69a]">{d.low.toLocaleString()}</span>
-        <span className="text-gray-500">종가</span>
-        <span className={isUp ? "text-[#ef5350]" : "text-[#26a69a]"}>
-          {d.close.toLocaleString()}
-        </span>
-        <span className="text-gray-500">거래량</span>
-        <span>{volStr}</span>
+  if (!data.length) {
+    return (
+      <div className="card h-[420px] flex items-center justify-center text-fg-3 text-sm">
+        차트 데이터 로드 중…
       </div>
-      {(d.ma5 ?? d.ma20 ?? d.ma60 ?? d.ma120) != null && (
-        <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-0.5 border-t border-gray-700 pt-1.5">
-          {d.ma5   != null && <><span className="text-[#f59e0b]">MA5</span>  <span className="text-gray-200">{d.ma5.toLocaleString()}</span></>}
-          {d.ma20  != null && <><span className="text-[#3b82f6]">MA20</span> <span className="text-gray-200">{d.ma20.toLocaleString()}</span></>}
-          {d.ma60  != null && <><span className="text-[#8b5cf6]">MA60</span> <span className="text-gray-200">{d.ma60.toLocaleString()}</span></>}
-          {d.ma120 != null && <><span className="text-[#ec4899]">MA120</span><span className="text-gray-200">{d.ma120.toLocaleString()}</span></>}
-        </div>
-      )}
-    </div>
-  );
-}
+    );
+  }
 
-// ── Main component ─────────────────────────────────────────────────────
-interface Props { code: string }
+  const W = 1000, H = 360;
+  const padX = 12, padTop = 12, padBottom = 30;
+  const innerW = W - padX * 2, innerH = H - padTop - padBottom;
+  const lows = data.map(d => Math.min(d.low, d.bb_lower ?? d.low));
+  const highs = data.map(d => Math.max(d.high, d.bb_upper ?? d.high));
+  const min = Math.min(...lows), max = Math.max(...highs);
+  const range = max - min || 1;
+  const colW = innerW / data.length;
+  const yFor = (v: number) => padTop + ((max - v) / range) * innerH;
 
-export function CandleChart({ code }: Props) {
-  const [period, setPeriod]       = useState<Period>("1y");
-  const [activeMas, setActiveMas] = useState<Set<MaKey>>(new Set(["ma5", "ma20"]));
-  const [showBB, setShowBB]       = useState(true);
+  const linePath = (key: keyof Candle) => data.map((d, i) => {
+    const v = d[key] as number | undefined;
+    if (v === undefined || v === null) return '';
+    const x = padX + i * colW + colW / 2;
+    const y = yFor(v);
+    return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
+  }).filter(Boolean).join(' ');
 
-  const { data: raw, isLoading } = useSWR<OhlcvItem[]>(
-    `ohlcv/${code}/${period}`,
-    () => fetchOhlcv(code, period).then(r => r.json()),
-    SWR_POLL,
-  );
+  const bbArea = (() => {
+    const upper = data.map((d, i) => {
+      const v = d.bb_upper; if (v === undefined) return '';
+      return `${i === 0 ? 'M' : 'L'} ${padX + i * colW + colW / 2} ${yFor(v)}`;
+    }).filter(Boolean).join(' ');
+    const lower = data.map((d, i) => d.bb_lower).map((v, i) => {
+      if (v === undefined) return '';
+      return `L ${padX + (data.length - 1 - i) * colW + colW / 2} ${yFor(v)}`;
+    }).filter(Boolean).reverse().join(' ');
+    return upper + ' ' + lower + ' Z';
+  })();
 
-  // Compute enriched data + domains
-  const { chartData, priceDomain, volDomain } = useMemo(() => {
-    if (!raw?.length) {
-      return {
-        chartData:   [] as EnrichedItem[],
-        priceDomain: [0, 1] as [number, number],
-        volDomain:   [0, 1] as [number, number],
-      };
-    }
-
-    const lo  = Math.min(...raw.map(d => d.low));
-    const hi  = Math.max(...raw.map(d => d.high));
-    const pad = (hi - lo) * 0.05;
-    const maxVol = Math.max(...raw.map(d => d.volume));
-
-    const chartData: EnrichedItem[] = raw.map(d => ({
-      ...d,
-      bb_band:
-        d.bb_upper != null && d.bb_lower != null
-          ? d.bb_upper - d.bb_lower
-          : undefined,
-    }));
-
-    return {
-      chartData,
-      priceDomain: [lo - pad, hi + pad] as [number, number],
-      // volume domain scaled so bars fill ~20% of chart height
-      volDomain: [0, maxVol * 5] as [number, number],
-    };
-  }, [raw]);
-
-  // Candlestick custom shape — closes over priceDomain
-  const renderCandle = useCallback(
-    (props: any) => {
-      const { x = 0, width = 0, background, payload } = props;
-      if (!payload || !background?.height) return <g />;
-
-      const { open, close, high, low } = payload as OhlcvItem;
-      const isUp  = close >= open;
-      const color = isUp ? UP_CLR : DN_CLR;
-
-      const [dMin, dMax] = priceDomain;
-      const range = dMax - dMin;
-      if (range === 0) return <g />;
-
-      const { y: chartY, height: chartH } = background as { y: number; height: number };
-      const px = (v: number) => chartY + ((dMax - v) / range) * chartH;
-
-      const highY  = px(high);
-      const lowY   = px(low);
-      const openY  = px(open);
-      const closeY = px(close);
-      const top    = Math.min(openY, closeY);
-      const bodyH  = Math.max(Math.abs(closeY - openY), 1);
-      const cx     = x + width / 2;
-
-      return (
-        <g>
-          {/* Upper wick: high → body top */}
-          <line x1={cx} y1={highY}       x2={cx} y2={top}        stroke={color} strokeWidth={1} />
-          {/* Lower wick: body bottom → low */}
-          <line x1={cx} y1={top + bodyH} x2={cx} y2={lowY}       stroke={color} strokeWidth={1} />
-          {/* Body */}
-          <rect
-            x={x + 1}
-            y={top}
-            width={Math.max(width - 2, 1)}
-            height={bodyH}
-            fill={color}
-          />
-        </g>
-      );
-    },
-    [priceDomain],
-  );
-
-  const toggleMa = (key: MaKey) =>
-    setActiveMas(prev => {
-      const next = new Set(prev);
-      next.has(key) ? next.delete(key) : next.add(key);
-      return next;
-    });
-
-  // ── Render ─────────────────────────────────────────────────────────
   return (
-    <div className="rounded-xl bg-[#131722] p-4">
-
-      {/* Controls row */}
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-
-        {/* Period tabs */}
-        <div className="flex gap-1">
-          {PERIODS.map(p => (
-            <button
-              key={p.value}
-              onClick={() => setPeriod(p.value)}
-              className={`rounded px-3 py-1 text-xs font-medium transition-colors ${
-                period === p.value
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-500 hover:text-gray-300"
-              }`}
-            >
-              {p.label}
-            </button>
-          ))}
+    <div className="card">
+      <div className="flex items-end justify-between mb-4">
+        <div>
+          <div className="kicker">OHLCV</div>
+          <h2 className="headline text-xl text-fg mt-1">캔들 차트</h2>
         </div>
-
-        {/* Indicator toggles */}
-        <div className="flex flex-wrap gap-1.5">
-          {MA_CONFIG.map(({ key, color, label }) => (
-            <button
-              key={key}
-              onClick={() => toggleMa(key)}
-              style={
-                activeMas.has(key)
-                  ? { borderColor: color, color, backgroundColor: color + "22" }
-                  : undefined
-              }
-              className={`rounded border px-2 py-0.5 text-xs transition-colors ${
-                activeMas.has(key)
-                  ? ""
-                  : "border-gray-700 text-gray-600 hover:border-gray-500 hover:text-gray-400"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-          <button
-            onClick={() => setShowBB(v => !v)}
-            className={`rounded border px-2 py-0.5 text-xs transition-colors ${
-              showBB
-                ? "border-blue-400 bg-blue-400/20 text-blue-300"
-                : "border-gray-700 text-gray-600 hover:border-gray-500 hover:text-gray-400"
-            }`}
-          >
-            BB
-          </button>
+        <div className="flex items-center gap-2">
+          <div className="flex bg-bg-3 border border-line rounded-md overflow-hidden">
+            {[['1m','1M'], ['3m','3M'], ['6m','6M'], ['1y','1Y']].map(([k, l]) => (
+              <button key={k} onClick={() => setPeriod(k)}
+                className={`px-3 py-1 text-[11px] font-mono ${period === k ? 'bg-accent text-bg' : 'text-fg-2 hover:text-fg'}`}>{l}</button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Chart area */}
-      {isLoading ? (
-        <div className="flex h-[460px] items-center justify-center">
-          <span className="text-sm text-gray-600">차트 로딩 중…</span>
-        </div>
-      ) : !chartData.length ? (
-        <div className="flex h-[460px] items-center justify-center">
-          <span className="text-sm text-gray-600">데이터 없음</span>
-        </div>
-      ) : (
-        <ResponsiveContainer width="100%" height={460}>
-          <ComposedChart
-            data={chartData}
-            margin={{ top: 4, right: 4, bottom: 0, left: 0 }}
-          >
-            <CartesianGrid
-              strokeDasharray="3 3"
-              stroke="#1e2232"
-              vertical={false}
-            />
-            <XAxis
-              dataKey="date"
-              tick={{ fill: "#4b5563", fontSize: 10 }}
-              axisLine={{ stroke: "#2a2d3e" }}
-              tickLine={false}
-              minTickGap={50}
-              tickFormatter={v => (typeof v === "string" ? v.slice(5) : v)}
-            />
-            {/* Price axis — right side */}
-            <YAxis
-              yAxisId="price"
-              orientation="right"
-              domain={priceDomain}
-              tick={{ fill: "#4b5563", fontSize: 10 }}
-              axisLine={false}
-              tickLine={false}
-              tickFormatter={v => v.toLocaleString()}
-              width={72}
-            />
-            {/* Volume axis — hidden, scaled so bars stay in bottom 20% */}
-            <YAxis
-              yAxisId="vol"
-              domain={volDomain}
-              hide
-            />
+      <div className="flex items-center gap-3 mb-3 flex-wrap">
+        {(['ma5', 'ma20', 'ma60', 'ma120'] as const).map(k => (
+          <label key={k} className="flex items-center gap-1.5 text-[11px] cursor-pointer">
+            <input type="checkbox" checked={showMA[k]} onChange={e => setShowMA(s => ({ ...s, [k]: e.target.checked }))} className="accent-accent" />
+            <span style={{ color: MA_COLORS[k] }}>━</span>
+            <span className="font-mono text-fg-2">{k.toUpperCase()}</span>
+          </label>
+        ))}
+        <label className="flex items-center gap-1.5 text-[11px] cursor-pointer">
+          <input type="checkbox" checked={showBB} onChange={e => setShowBB(e.target.checked)} className="accent-accent" />
+          <span className="text-[#86d96d]">▒</span>
+          <span className="font-mono text-fg-2">볼린저</span>
+        </label>
+      </div>
 
-            <Tooltip
-              content={<CandleTooltip />}
-              cursor={{ stroke: "#374151", strokeWidth: 1 }}
-            />
-
-            {/* ① Volume bars (rendered first → behind everything) */}
-            <Bar
-              yAxisId="vol"
-              dataKey="volume"
-              isAnimationActive={false}
-              radius={[1, 1, 0, 0]}
-              maxBarSize={12}
-            >
-              {chartData.map((d, i) => (
-                <Cell
-                  key={i}
-                  fill={
-                    d.close >= d.open
-                      ? "rgba(38,166,154,0.35)"
-                      : "rgba(239,83,80,0.35)"
-                  }
-                />
-              ))}
-            </Bar>
-
-            {/* ② Bollinger Band fill (stacked area trick) */}
-            {showBB && (
-              <>
-                {/* Invisible base: 0 → bb_lower (stacking offset) */}
-                <Area
-                  yAxisId="price"
-                  type="monotone"
-                  dataKey="bb_lower"
-                  stackId="bb"
-                  fill="none"
-                  stroke="none"
-                  dot={false}
-                  activeDot={false}
-                  legendType="none"
-                  isAnimationActive={false}
-                  connectNulls
-                />
-                {/* Visible band: bb_lower → bb_upper */}
-                <Area
-                  yAxisId="price"
-                  type="monotone"
-                  dataKey="bb_band"
-                  stackId="bb"
-                  fill="rgba(96,165,250,0.10)"
-                  stroke="none"
-                  dot={false}
-                  activeDot={false}
-                  legendType="none"
-                  isAnimationActive={false}
-                  connectNulls
-                />
-                {/* BB upper border */}
-                <Line
-                  yAxisId="price"
-                  type="monotone"
-                  dataKey="bb_upper"
-                  stroke={BB_CLR}
-                  strokeWidth={1}
-                  strokeDasharray="4 2"
-                  dot={false}
-                  activeDot={false}
-                  legendType="none"
-                  isAnimationActive={false}
-                  connectNulls
-                />
-                {/* BB lower border */}
-                <Line
-                  yAxisId="price"
-                  type="monotone"
-                  dataKey="bb_lower"
-                  stroke={BB_CLR}
-                  strokeWidth={1}
-                  strokeDasharray="4 2"
-                  dot={false}
-                  activeDot={false}
-                  legendType="none"
-                  isAnimationActive={false}
-                  connectNulls
-                />
-              </>
-            )}
-
-            {/* ③ Candlestick bars (on top of BB fill) */}
-            <Bar
-              yAxisId="price"
-              dataKey="high"
-              shape={renderCandle}
-              isAnimationActive={false}
-              legendType="none"
-              maxBarSize={14}
-            />
-
-            {/* ④ MA Lines (topmost layer) */}
-            {MA_CONFIG.map(({ key, color }) =>
-              activeMas.has(key) ? (
-                <Line
-                  key={key}
-                  yAxisId="price"
-                  type="monotone"
-                  dataKey={key}
-                  stroke={color}
-                  strokeWidth={1.5}
-                  dot={false}
-                  activeDot={false}
-                  legendType="none"
-                  isAnimationActive={false}
-                  connectNulls
-                />
-              ) : null,
-            )}
-          </ComposedChart>
-        </ResponsiveContainer>
-      )}
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full">
+        {/* grid */}
+        {[0.25, 0.5, 0.75].map(p => (
+          <line key={p} x1={padX} x2={W - padX} y1={padTop + innerH * p} y2={padTop + innerH * p}
+                stroke="#232936" strokeWidth="1" strokeDasharray="2 4" />
+        ))}
+        {/* BB band */}
+        {showBB && <path d={bbArea} fill="#86d96d" fillOpacity="0.06" stroke="none" />}
+        {/* Candles */}
+        {data.map((d, i) => {
+          const x = padX + i * colW + colW / 2;
+          const up = d.close >= d.open;
+          const c = up ? '#ff5b5b' : '#4a90ff';
+          const yHigh = yFor(d.high), yLow = yFor(d.low);
+          const yOpen = yFor(d.open), yClose = yFor(d.close);
+          const bodyTop = Math.min(yOpen, yClose);
+          const bodyH = Math.max(1, Math.abs(yClose - yOpen));
+          const bodyW = Math.max(1, colW * 0.6);
+          return (
+            <g key={i}>
+              <line x1={x} x2={x} y1={yHigh} y2={yLow} stroke={c} strokeWidth="1" />
+              <rect x={x - bodyW / 2} y={bodyTop} width={bodyW} height={bodyH} fill={c} />
+            </g>
+          );
+        })}
+        {/* MA lines */}
+        {(['ma5', 'ma20', 'ma60', 'ma120'] as const).map(k => showMA[k] && (
+          <path key={k} d={linePath(k)} fill="none" stroke={MA_COLORS[k]} strokeWidth="1.5" />
+        ))}
+      </svg>
     </div>
   );
 }
