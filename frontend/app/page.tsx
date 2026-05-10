@@ -63,7 +63,7 @@ export default function HomePage() {
     fetch('/api/fear-greed').then(r => r.json()).then(d => {
       if (!d.isMock) setLiveFearGreedUS(d);
     }).catch(() => {});
-    const base = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    const base = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/^﻿/, "") || "http://localhost:8000";
     fetch(`${base}/api/market/fear-greed/kr`).then(r => r.json()).then(d => {
       if (d.score !== undefined) setLiveFearGreedKR(d);
     }).catch(() => {});

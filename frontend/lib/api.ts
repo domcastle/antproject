@@ -2,7 +2,7 @@
 // 백엔드 호출 함수는 이 파일에서만 정의. 컴포넌트 내부 fetch 직접 호출 금지.
 // fetchZone → fetchSilhouette 수정: /zone 엔드포인트 없음, /silhouette 통합 (common-base.md 6.1)
 
-const BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const BASE = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/^﻿/, "") || "http://localhost:8000";
 const POLL = 900_000; // 15분
 
 export const fetchFearGreedKR = () => fetch(`${BASE}/api/market/fear-greed/kr`);
