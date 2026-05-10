@@ -48,23 +48,14 @@ def compute(df: pd.DataFrame) -> dict[str, list]:
     ma60  = _sma(closes, 60)
     ma120 = _sma(closes, 120)
 
-    # ── 볼린저밴드 (SMA20 ± 2σ, 표본표준편차 ddof=1) ──────────────────────
+    # ── 볼린저밴드 (SMA20 ± 2σ, 모집단 표준편차 ddof=0 — TradingView/HTS 동일)
     mid = closes.rolling(_BB_PERIOD).mean()
-    std = closes.rolling(_BB_PERIOD).std(ddof=1)
+    std = closes.rolling(_BB_PERIOD).std(ddof=0)
     bb_upper = [_fmt(m + _BB_SIGMA * s) for m, s in zip(mid, std)]
     bb_lower = [_fmt(m - _BB_SIGMA * s) for m, s in zip(mid, std)]
 
-    # ── RSI 14일 (Wilder's smoothing) ────────────────────────────────────
-    # Wilder 공식: avg = (prev_avg * 13 + current) / 14
-    # → ewm(alpha=1/14, adjust=False) 와 동치
-    delta    = closes.diff()
-    gain     = delta.clip(lower=0.0)
-    loss     = (-delta).clip(lower=0.0)
-    avg_gain = gain.ewm(alpha=1.0 / _RSI_PERIOD, min_periods=_RSI_PERIOD, adjust=False).mean()
-    avg_loss = loss.ewm(alpha=1.0 / _RSI_PERIOD, min_periods=_RSI_PERIOD, adjust=False).mean()
-    rs       = avg_gain / avg_loss.replace(0.0, np.nan)
-    rsi_s    = 100.0 - (100.0 / (1.0 + rs))
-    rsi      = [_fmt(v) for v in rsi_s]
+    # ── RSI 14일 (True Wilder's RMA — TradingView/HTS 동일 방식) ────────────
+    rsi = _wilder_rsi(closes, _RSI_PERIOD)
 
     return {
         "ma5":      ma5,
@@ -129,6 +120,42 @@ def compute_beta(code: str, daily_closes: list[float]) -> float | None:
 def _sma(series: pd.Series, period: int) -> list:
     raw = series.rolling(period).mean()
     return [_fmt(v) for v in raw]
+
+
+def _wilder_rsi(closes: pd.Series, period: int) -> list:
+    """True Wilder's RSI — TradingView / 국내 HTS와 동일한 RMA 방식.
+
+    시드: 첫 period개 상승/하락의 단순평균(SMA)
+    이후: avg = (prev * (period-1) + current) / period
+    """
+    delta = closes.diff()
+    gain  = delta.clip(lower=0.0).values
+    loss  = (-delta).clip(lower=0.0).values
+    n     = period
+    size  = len(closes)
+    result: list[float | None] = [None] * size
+
+    if size <= n:
+        return result
+
+    # 시드: index 1..n 의 단순평균 (index 0은 diff=NaN)
+    avg_gain = float(np.mean(gain[1:n + 1]))
+    avg_loss = float(np.mean(loss[1:n + 1]))
+
+    if avg_loss == 0:
+        result[n] = 100.0
+    else:
+        result[n] = round(100.0 - 100.0 / (1.0 + avg_gain / avg_loss), 2)
+
+    for i in range(n + 1, size):
+        avg_gain = (avg_gain * (n - 1) + gain[i]) / n
+        avg_loss = (avg_loss * (n - 1) + loss[i]) / n
+        if avg_loss == 0:
+            result[i] = 100.0
+        else:
+            result[i] = round(100.0 - 100.0 / (1.0 + avg_gain / avg_loss), 2)
+
+    return result
 
 
 def _fmt(value) -> float | None:

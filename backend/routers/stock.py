@@ -37,21 +37,26 @@ def get_ohlcv(
     period: str = Query("1y", description="기간: 1y | 6m | 3m | 1m"),
 ):
     """
-    OHLCV에 MA(5/20/60/120일 SMA)와 볼린저밴드(20일/2σ)를 합산해 반환.
+    OHLCV + MA(5/20/60/120일 SMA) + 볼린저밴드(20일/2σ) 반환.
 
-    indicator.compute()는 항상 실행 — mock/live 구분 없이 단일 코드 패스.
-    데이터 부족 초기 구간(예: ma120 앞 119행)은 해당 필드를 null로 반환.
+    내부적으로 RSI/BB 수렴을 위해 워밍업 포함 전체 데이터로 지표 계산 후,
+    화면 표시용 기간(period)에 해당하는 최신 N행만 반환.
     """
-    ohlcv_raw = data_collector.get_ohlcv(code, period)
-    if not ohlcv_raw:
+    all_raw = data_collector.get_ohlcv(code, period)
+    if not all_raw:
         raise HTTPException(status_code=404, detail=f"OHLCV data not found: {code}")
 
-    ohlcv_df   = pd.DataFrame(ohlcv_raw)
+    # 지표는 워밍업 포함 전체 데이터로 계산
+    ohlcv_df   = pd.DataFrame(all_raw)
     indicators = indicator.compute(ohlcv_df)
 
+    # 표시는 요청 기간에 해당하는 최신 N행만
+    n_display  = data_collector.PERIOD_TRADING_DAYS.get(period, 252)
+    start_i    = max(0, len(all_raw) - n_display)
+
     result = []
-    for i, item in enumerate(ohlcv_raw):
-        row = dict(item)
+    for i in range(start_i, len(all_raw)):
+        row = dict(all_raw[i])
         row["ma5"]      = indicators["ma5"][i]
         row["ma20"]     = indicators["ma20"][i]
         row["ma60"]     = indicators["ma60"][i]

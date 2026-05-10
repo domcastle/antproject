@@ -9,14 +9,22 @@ const ZONE_META: Record<number, { label: string; color: string; signal: string; 
 };
 
 export default function SilhouettePanel({
-  zone, positionPct, signal,
+  zone, positionPct, signal, rsi,
 }: {
   zone: number;
   positionPct: number;
   signal?: string;
+  rsi?: number | null;
 }) {
   const meta = ZONE_META[zone] ?? ZONE_META[3];
   const dotY = { 1: 88, 2: 72, 3: 52, 4: 32, 5: 12 }[zone] ?? 50;
+
+  const rsiLabel = rsi != null
+    ? rsi >= 70 ? '과매수' : rsi <= 30 ? '과매도' : '중립'
+    : null;
+  const rsiColor = rsi != null
+    ? rsi >= 70 ? '#ff5b5b' : rsi <= 30 ? '#4ade80' : '#aab2bf'
+    : '#aab2bf';
 
   return (
     <div className="card">
@@ -70,13 +78,30 @@ export default function SilhouettePanel({
               </div>
             );
           })}
-          <div className="pt-3 mt-3 border-t border-line">
-            <div className="num text-2xl font-semibold" style={{ color: meta.color }}>{positionPct}%</div>
-            <div className="text-[11px] text-fg-3 mt-0.5">52주 가격 범위 내 위치</div>
+          <div className="pt-3 mt-3 border-t border-line space-y-2">
+            <div>
+              <div className="num text-2xl font-semibold" style={{ color: meta.color }}>{positionPct}%</div>
+              <div className="text-[11px] text-fg-3 mt-0.5">52주 가격 범위 내 위치</div>
+            </div>
+            {rsi != null && (
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] text-fg-3">RSI(14)</span>
+                <span className="num text-sm font-semibold" style={{ color: rsiColor }}>{rsi.toFixed(1)}</span>
+                {rsiLabel && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded"
+                        style={{ background: rsiColor + '18', color: rsiColor }}>
+                    {rsiLabel}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
-      <div className="plain-help mt-4">{meta.desc}</div>
+
+      {signal && (
+        <div className="plain-help mt-4">{signal}</div>
+      )}
     </div>
   );
 }

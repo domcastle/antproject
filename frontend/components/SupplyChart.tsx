@@ -59,7 +59,7 @@ export default function SupplyChart({ code }: { code: string }) {
           <div className="kicker">Supply · 5D</div>
           <h2 className="headline text-xl text-fg mt-1">5일 수급</h2>
         </div>
-        <div className="text-[11px] text-fg-3">단위: 만원</div>
+        <div className="text-[11px] text-fg-3">단위: 억원</div>
       </div>
       <div className="space-y-3">
         <Bar label="개인"   val={totals.individual}   c="#c8a464" />
