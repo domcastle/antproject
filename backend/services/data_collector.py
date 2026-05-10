@@ -407,12 +407,16 @@ def _fetch_ohlcv_live(code: str, period: str) -> list[dict]:
         df = stock.get_market_ohlcv(from_dt, today, code)
         rows = []
         for dt_idx, row in df.iterrows():
+            close = int(row["종가"])
+            open_ = int(row["시가"]) or close  # 시가=0이면 종가로 대체
+            high  = int(row["고가"]) or close
+            low   = int(row["저가"]) or close
             rows.append({
                 "date":   str(dt_idx)[:10],
-                "open":   int(row["시가"]),
-                "high":   int(row["고가"]),
-                "low":    int(row["저가"]),
-                "close":  int(row["종가"]),
+                "open":   open_,
+                "high":   high,
+                "low":    low,
+                "close":  close,
                 "volume": int(row["거래량"]),
             })
         return rows
