@@ -371,6 +371,22 @@ def _fetch_stock_list_live() -> list[dict]:
     return rows
 
 
+# 프론트 period 값 → yfinance 형식 매핑 ("3m" → "3mo" 등)
+_YF_PERIOD_MAP: dict[str, str] = {
+    "1m": "1mo",
+    "3m": "3mo",
+    "6m": "6mo",
+    "1y": "1y",
+}
+# 기간별 근사 거래일 수 (mock 슬라이싱에 사용)
+_PERIOD_TRADING_DAYS: dict[str, int] = {
+    "1y": 252,
+    "6m": 126,
+    "3m": 65,
+    "1m": 22,
+}
+
+
 def _fetch_ohlcv_live(code: str, period: str) -> list[dict]:
     """종목 OHLCV — KR(pykrx) / US(yfinance) 분기."""
     from pykrx import stock
@@ -393,8 +409,9 @@ def _fetch_ohlcv_live(code: str, period: str) -> list[dict]:
             })
         return rows
     else:
-        # US ticker
-        df = yf.Ticker(code).history(period=period, interval="1d")
+        # US ticker — yfinance는 "3mo"/"6mo" 형식 요구, 프론트 "3m"/"6m" 변환
+        yf_period = _YF_PERIOD_MAP.get(period, period)
+        df = yf.Ticker(code).history(period=yf_period, interval="1d")
         rows = []
         for dt_idx, row in df.iterrows():
             rows.append({
@@ -601,11 +618,18 @@ def get_stock_list() -> list[dict]:
 
 
 def get_ohlcv(code: str, period: str = "1y") -> list[dict]:
-    cache_key  = f"ohlcv_{code}_{period}"
-    mock_file  = f"krx_{code}.json" if code.isdigit() else f"m7_{code}.json"
+    cache_key = f"ohlcv_{code}_{period}"
+    mock_file = f"krx_{code}.json" if code.isdigit() else f"m7_{code}.json"
 
     if not _ttl_expired(cache_key):
         return _cache[cache_key]["data"]
+
+    if API_MODE == "mock":
+        all_rows = load_mock(mock_file)
+        n = _PERIOD_TRADING_DAYS.get(period, 252)
+        data = all_rows[-n:] if n < len(all_rows) else all_rows
+        _cache[cache_key] = {"data": data, "updated_at": _now(), "is_mock": True}
+        return data
 
     return _with_fallback(cache_key, lambda: _fetch_ohlcv_live(code, period), mock_file)
 

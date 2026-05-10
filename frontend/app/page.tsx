@@ -113,6 +113,58 @@ export default function HomePage() {
   const buffettVal = apiMacro?.buffett_index ?? BUFFETT.us;
   const buffettStatus = buffettVal >= 150 ? 'bubble' : buffettVal >= 100 ? 'overvalued' : buffettVal >= 70 ? 'neutral' : 'undervalued';
 
+  // ── 주요 지수 plain-help ────────────────────────────────────────────
+  const krAvgChange = (() => {
+    const kr = mergedIndices.filter(i => i.name === 'KOSPI' || i.name === 'KOSDAQ');
+    return kr.length ? kr.reduce((s, i) => s + ((i as any).changePct ?? 0), 0) / kr.length : 0;
+  })();
+  const usAvgChange = (() => {
+    const us = mergedIndices.filter(i => i.name === 'S&P500' || i.name === 'NASDAQ');
+    return us.length ? us.reduce((s, i) => s + ((i as any).changePct ?? 0), 0) / us.length : 0;
+  })();
+  const indicesHelpText =
+    krAvgChange > 0 && usAvgChange > 0
+      ? <><b>국내외 시장 모두 상승</b>하고 있어요. 위험선호 분위기이니 보유 종목은 유지하고, 관심 종목 비중을 조금씩 늘려볼 만해요.</>
+      : krAvgChange <= 0 && usAvgChange <= 0
+        ? <>국내외 시장 <b>모두 약세</b>예요. 신규 진입보다 현금 비중을 높이거나 <b>방어적 포지션</b>을 유지하는 게 안전해요.</>
+        : krAvgChange > usAvgChange
+          ? <>오늘은 <b>국내가 미국보다 강한</b> 흐름이에요. 국내 우량주 비중을 우선 검토하고, 미국은 비중 조절을 고려해 보세요.</>
+          : <>오늘은 <b>미국이 국내보다 강한</b> 흐름이에요. 엇갈린 분위기에선 한쪽에 베팅하기보다 <b>두 시장에 나눠 담아두는 전략</b>이 안전해요.</>;
+
+  // ── 공포 & 탐욕 plain-help ──────────────────────────────────────────
+  const krStatus = (fearGreedKR as any).status ?? '';
+  const usStatus = (fearGreedUS as any).status ?? (fearGreedUS as any).label ?? '';
+  const fearGreedKRHelpText =
+    krStatus === 'extreme_fear'
+      ? <>국내 시장이 <b>극도의 공포</b> 상태예요. 패닉 매도가 나올 수 있지만, 장기적으로 바닥 근처일 가능성도 있어요. <b>분할 매수</b>를 천천히 고려해볼 타이밍이에요.</>
+      : krStatus === 'fear'
+        ? <>국내 시장에 <b>공포 심리</b>가 퍼져 있어요. 좋은 종목을 <b>싸게 살 기회</b>가 될 수 있어요. 한 번에 몰빵하기보다 나눠서 천천히 들어가 보세요.</>
+        : krStatus === 'greed'
+          ? <>국내 시장에 <b>탐욕 분위기</b>가 형성되고 있어요. 상승세가 이어질 수 있지만, <b>신규 진입은 신중</b>하게 접근하는 게 좋아요.</>
+          : krStatus === 'extreme_greed'
+            ? <>국내 시장이 <b>극도의 탐욕</b> 상태예요. 단기 과열 신호이므로 새로 큰 비중으로 들어가긴 부담스럽고, <b>보유 종목 일부 익절</b>을 검토해볼 시점이에요.</>
+            : <>국내 시장은 <b>중립 구간</b>이에요. 뚜렷한 방향성이 없는 시기엔 관망하거나, 이미 보유한 종목 위주로 관리하는 게 좋아요.</>;
+  const fearGreedUSHelpText =
+    usStatus === 'extreme_fear'
+      ? <>미국 시장이 <b>극도의 공포</b> 상태예요. 역사적으로 이 구간 이후 반등이 나왔지만, 변동성이 크니 <b>한 번에 큰 비중은 위험</b>해요.</>
+      : usStatus === 'fear'
+        ? <>미국 시장에 <b>공포 심리</b>가 감돌아요. 상대적으로 저렴하게 살 기회이지만, 하락이 더 이어질 수 있어 <b>분할 매수 전략</b>이 유효해요.</>
+        : usStatus === 'greed'
+          ? <>미국 시장에 <b>탐욕 분위기</b>가 확산되고 있어요. 분위기는 좋지만 과열 가능성도 있어, <b>신규 매수는 작은 비중</b>부터 접근하는 걸 추천해요.</>
+          : usStatus === 'extreme_greed'
+            ? <>미국 시장이 <b>극도의 탐욕</b> 상태예요. 단기 과열 신호이니 새로 큰 비중으로 들어가긴 부담스럽고, <b>보유분은 분산</b>해 리스크를 낮추는 게 좋아요.</>
+            : <>미국 시장은 <b>중립 구간</b>이에요. 뚜렷한 매수·매도 신호가 없는 시기엔 기존 포지션을 유지하며 관망하는 게 무난해요.</>;
+
+  // ── 버핏 지수 plain-help ────────────────────────────────────────────
+  const buffettHelpText =
+    buffettStatus === 'undervalued'
+      ? <>시장 전체가 <b>저평가</b> 상태예요. 역사적으로 이 구간에서 매수한 경우 장기 수익 가능성이 높았어요. <b>우량 종목 비중을 천천히 늘려보는 게 유리</b>해요.</>
+      : buffettStatus === 'neutral'
+        ? <>시장 밸류에이션이 <b>적정 수준</b>이에요. 지금은 무리한 베팅보다 기존 포지션을 관리하고, <b>저평가 개별 종목을 탐색</b>하는 전략이 좋아요.</>
+        : buffettStatus === 'bubble'
+          ? <>시장 전체가 <b>거품 구간</b>에 진입했어요. 과거 같은 수치 이후엔 큰 조정이 잦았어요. <b>현금 비중을 높이거나 방어적 포지션</b>으로 전환을 고려해 보세요.</>
+          : <>시장 전체가 <b>다소 비싸진 상태</b>예요. 과거 같은 수치 이후엔 조정이 자주 있었어요. <b>새로 크게 들어가긴 부담스럽고</b>, 가진 종목은 분산해서 위험을 나눠두는 게 좋아요.</>;
+
   return (
     <div className="flex min-h-screen">
       <Sidebar active="home" />
@@ -130,10 +182,7 @@ export default function HomePage() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
             {mergedIndices.map(idx => <IndexCard key={idx.name} idx={idx} />)}
           </div>
-          <div className="plain-help mb-8">
-            오늘은 <b>국내는 약하고 미국은 강한</b> 흐름이에요. 엇갈린 분위기에선 한쪽에 베팅하기보다,{' '}
-            <b>두 시장에 나눠 담아 두는 전략</b>이 안전해요.
-          </div>
+          <div className="plain-help mb-8">{indicesHelpText}</div>
 
           {/* Fear & Greed + Buffett */}
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-8">
@@ -158,19 +207,13 @@ export default function HomePage() {
                 components={fearGreedTab === 'KR' ? fearGreedKR.components : null}
               />
               <div className="plain-help mt-4">
-                {fearGreedTab === 'KR'
-                  ? <>지금 국내 시장은 <b>공포 구간</b>이에요. 투자자들이 겁을 내고 있어, 좋은 종목을 <b>싸게 살 기회</b>가 될 수 있어요. 한 번에 몰빵하기보다 나눠서 천천히 들어가 보세요.</>
-                  : <>미국 시장은 <b>탐욕 구간</b>이에요. 분위기가 좋아 사람들이 적극적으로 매수 중이지만, <b>단기 과열</b> 신호이기도 해요. 새로 큰 비중으로 들어가긴 부담스러워요.</>}
+                {fearGreedTab === 'KR' ? fearGreedKRHelpText : fearGreedUSHelpText}
               </div>
             </div>
             <div className="card lg:col-span-2">
               <SectionTitle kicker="Valuation" title="버핏 지수" />
               <BuffettGauge value={buffettVal} status={buffettStatus} />
-              <div className="plain-help mt-5">
-                시장 전체가 <b style={{ color: '#ff7777' }}>많이 비싸진 상태</b>예요.
-                과거 같은 수치 이후엔 조정이 자주 있었어요. <b>새로 크게 들어가긴 부담스럽고</b>,
-                가진 종목은 분산해서 위험을 나눠두는 게 좋아요.
-              </div>
+              <div className="plain-help mt-5">{buffettHelpText}</div>
             </div>
           </div>
 

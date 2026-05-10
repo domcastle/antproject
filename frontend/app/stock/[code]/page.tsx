@@ -1,7 +1,8 @@
 'use client';
-import { use, useEffect, useState } from 'react';
+import { use, useEffect, useMemo, useState } from 'react';
+import useSWR from 'swr';
 import { STOCKS, calcSilhouetteZone } from '@/lib/mockData';
-import { fetchSilhouette } from '@/lib/api';
+import { fetchSilhouette, fetchStockList, SWR_POLL } from '@/lib/api';
 import Sidebar from '@/components/Sidebar';
 import StockHeader from '@/components/StockHeader';
 import CandleChart from '@/components/CandleChart';
@@ -14,6 +15,20 @@ export default function StockDetailPage({ params }: { params: Promise<{ code: st
   const { code } = use(params);
   const stock = STOCKS.find(s => s.code === code) ?? STOCKS[0];
   const [silhouette, setSilhouette] = useState<{ zone: number; position_pct: number; signal_text?: string } | null>(null);
+
+  const { data: stockListRaw } = useSWR<any[]>(
+    'stock-list', () => fetchStockList().then(r => r.json()), SWR_POLL,
+  );
+  const apiStock = useMemo(
+    () => stockListRaw?.find((s: any) => s.code === code) ?? null,
+    [stockListRaw, code],
+  );
+
+  const livePrice    = apiStock?.price      ?? stock.price;
+  const liveChangePct = apiStock?.change_pct ?? stock.changePct;
+  const liveChange   = apiStock
+    ? Math.round(livePrice * liveChangePct / 100 * 10) / 10
+    : stock.change;
 
   useEffect(() => {
     fetchSilhouette(code).then(r => r.json()).then(d => {
@@ -30,7 +45,13 @@ export default function StockDetailPage({ params }: { params: Promise<{ code: st
       <Sidebar active="stock" />
       <main className="flex-1 overflow-x-hidden">
         <div className="px-10 py-8 max-w-[1400px] mx-auto">
-          <StockHeader stock={{ ...stock, silhouetteZone: zone } as any} />
+          <StockHeader stock={{
+            ...stock,
+            price: livePrice,
+            change: liveChange,
+            changePct: liveChangePct,
+            silhouetteZone: zone,
+          } as any} />
 
           <div className="mb-4">
             <CandleChart code={code} />
