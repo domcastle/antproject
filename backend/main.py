@@ -7,6 +7,7 @@ main.py — FastAPI 앱 진입점
 import logging
 import os
 from contextlib import asynccontextmanager
+
 from datetime import datetime, timezone
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -35,17 +36,8 @@ scheduler = AsyncIOScheduler()
 # ── lifespan ──────────────────────────────────────────────────────────────
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # 1. KRX 로그인 — 실패해도 앱 부팅 계속
-    if KRX_ID and KRX_PW:
-        try:
-            from pykrx import stock
-            stock.set_krx_id(KRX_ID)
-            stock.set_krx_password(KRX_PW)
-            logger.info("KRX login success")
-        except Exception as e:
-            logger.warning(f"KRX login failed (non-fatal): {e}")
-    else:
-        logger.info("KRX credentials not set — skipping login")
+    # 1. KRX 로그인 — pykrx가 KRX_ID/KRX_PW 환경변수를 감지해 자동 처리
+    logger.info("KRX login handled by pykrx via environment variables")
 
     # 2. 초기 데이터 수집 (data_collector 소유)
     await startup_fetch()

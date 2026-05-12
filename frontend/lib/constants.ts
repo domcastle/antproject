@@ -29,3 +29,5 @@ export const BUFFETT_THRESHOLDS = {
   neutral:     100,
   overvalued:  150,
 } as const;
+
+export const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';

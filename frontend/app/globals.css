@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+@theme {
+  /* ── Colors ──────────────────────────── */
+  --color-bg:       #0b0d12;
+  --color-bg-2:     #12151c;
+  --color-bg-3:     #1a1e27;
+  --color-line:     #232936;
+  --color-line-2:   #2c3340;
+  --color-fg:       #eef0f4;
+  --color-fg-2:     #aab2bf;
+  --color-fg-3:     #6f7785;
+  --color-accent:   #c8a464;
+  --color-accent-2: #e2c181;
+  --color-up:       #ff5b5b;
+  --color-down:     #4a90ff;
+  --color-zone-1:   #4ade80;
+  --color-zone-2:   #86d96d;
+  --color-zone-3:   #c8a464;
+  --color-zone-4:   #f5a623;
+  --color-zone-5:   #ff5b5b;
+
+  /* ── Type ────────────────────────────── */
+  --font-sans:     "Pretendard Variable", Pretendard, -apple-system, system-ui, sans-serif;
+  --font-mono:     var(--font-mono), "IBM Plex Mono", ui-monospace, monospace;
+  --font-headline: var(--font-headline), "Newsreader", Georgia, serif;
+
+  /* ── Radii ───────────────────────────── */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+}
+
+html, body {
+  background: var(--color-bg);
+  color: var(--color-fg);
+  letter-spacing: -0.01em;
+  font-feature-settings: "ss01", "tnum";
+}
+
+/* ── Number tabular ───────────────────── */
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* ── Section title block ─────────────── */
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  color: var(--color-accent);
+  text-transform: uppercase;
+}
+.headline {
+  font-family: var(--font-headline);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+/* ── Plain-language help box ─────────── */
+.plain-help {
+  background: var(--color-bg-2);
+  border: 1px solid var(--color-line);
+  border-left: 3px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  font-size: 13px;
+  color: var(--color-fg-2);
+  line-height: 1.6;
+}
+.plain-help b { color: var(--color-fg); font-weight: 600; }
+.plain-help::before {
+  content: "쉽게 풀면";
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* ── Card ────────────────────────────── */
+.card {
+  background: var(--color-bg-2);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+}
+
+/* ── Scrollbar ───────────────────────── */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-line); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-line-2); }
+
+/* ── Ticker animation ────────────────── */
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.ticker-track {
+  animation: ticker-scroll 60s linear infinite;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  width: max-content;
+  min-width: 100%;
+}

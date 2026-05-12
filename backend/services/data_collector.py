@@ -323,19 +323,30 @@ def _fetch_stock_list_live() -> list[dict]:
 
     rows = []
 
-    # KR
+    # KR — 최근 5일 역순 탐색으로 가장 최근 거래일 데이터 사용 (휴장일 대응)
     try:
-        df_ohlcv = stock.get_market_ohlcv(today, market="KOSPI")
-        for code in kr_codes:
-            if code in df_ohlcv.index:
-                row = df_ohlcv.loc[code]
-                rows.append({
-                    "code": code, "name": kr_names[code], "market": "KR",
-                    "price": int(row.get("종가", 0)),
-                    "change_pct": round(float(row.get("등락률", 0)), 2),
-                    "volume": int(row.get("거래대금", 0)) // 10000,
-                    "zone": 3,  # silhouette.py가 정밀 계산 — 여기서는 중립값
-                })
+        df_ohlcv = None
+        for delta in range(5):
+            check_date = (datetime.now(timezone.utc) - pd.Timedelta(days=delta)).strftime("%Y%m%d")
+            df_try = stock.get_market_ohlcv(check_date, market="KOSPI")
+            if not df_try.empty and df_try["종가"].sum() > 0:
+                df_ohlcv = df_try
+                logger.info(f"KR stock ohlcv using date: {check_date}")
+                break
+        if df_ohlcv is not None:
+            for code in kr_codes:
+                if code in df_ohlcv.index:
+                    row = df_ohlcv.loc[code]
+                    price = int(row.get("종가", 0))
+                    if price == 0:
+                        continue
+                    rows.append({
+                        "code": code, "name": kr_names[code], "market": "KR",
+                        "price": price,
+                        "change_pct": round(float(row.get("등락률", 0)), 2),
+                        "volume": int(row.get("거래대금", 0)) // 10000,
+                        "zone": 3,
+                    })
     except Exception as e:
         logger.warning(f"KR stock list fetch failed: {e}")
 
@@ -360,30 +371,63 @@ def _fetch_stock_list_live() -> list[dict]:
     return rows
 
 
+# 프론트 period 값 → yfinance 형식 매핑 ("3m" → "3mo" 등)
+_YF_PERIOD_MAP: dict[str, str] = {
+    "1m": "1mo",
+    "3m": "3mo",
+    "6m": "6mo",
+    "1y": "1y",
+}
+# 기간별 근사 거래일 수 (라우터 슬라이싱 + mock에서 사용)
+PERIOD_TRADING_DAYS: dict[str, int] = {
+    "1y": 252,
+    "6m": 126,
+    "3m": 65,
+    "1m": 22,
+}
+_PERIOD_TRADING_DAYS = PERIOD_TRADING_DAYS  # 내부 호환
+
+# RSI Wilder's 수렴을 위한 추가 워밍업 — 14일 주기 × 50배 이상 권장
+_OHLCV_WARMUP_EXTRA_DAYS = 730
+
+
 def _fetch_ohlcv_live(code: str, period: str) -> list[dict]:
-    """종목 OHLCV — KR(pykrx) / US(yfinance) 분기."""
+    """종목 OHLCV — KR(pykrx) / US(yfinance) 분기.
+
+    RSI 수렴을 위해 요청 기간 + _OHLCV_WARMUP_EXTRA_DAYS 만큼 더 가져온다.
+    라우터에서 표시용으로 슬라이싱하므로 전체 행을 그대로 반환.
+    """
     from pykrx import stock
 
     # 숫자 코드 → KRX
     if code.isdigit():
         today   = _now().strftime("%Y%m%d")
         days    = {"1y": 365, "6m": 180, "3m": 90, "1m": 30}.get(period, 365)
-        from_dt = (datetime.now(timezone.utc) - pd.Timedelta(days=days)).strftime("%Y%m%d")
+        from_dt = (datetime.now(timezone.utc) - pd.Timedelta(days=days + _OHLCV_WARMUP_EXTRA_DAYS)).strftime("%Y%m%d")
         df = stock.get_market_ohlcv(from_dt, today, code)
         rows = []
         for dt_idx, row in df.iterrows():
+            close = int(row["종가"])
+            open_ = int(row["시가"]) or close  # 시가=0이면 종가로 대체
+            high  = int(row["고가"]) or close
+            low   = int(row["저가"]) or close
             rows.append({
                 "date":   str(dt_idx)[:10],
-                "open":   int(row["시가"]),
-                "high":   int(row["고가"]),
-                "low":    int(row["저가"]),
-                "close":  int(row["종가"]),
+                "open":   open_,
+                "high":   high,
+                "low":    low,
+                "close":  close,
                 "volume": int(row["거래량"]),
             })
         return rows
     else:
-        # US ticker
-        df = yf.Ticker(code).history(period=period, interval="1d")
+        # US ticker — 워밍업 포함 5y 시도, 실패 시 요청 기간 사용
+        try:
+            df = yf.Ticker(code).history(period="5y", interval="1d")
+            if df.empty:
+                raise ValueError("empty")
+        except Exception:
+            df = yf.Ticker(code).history(period=_YF_PERIOD_MAP.get(period, "1y"), interval="1d")
         rows = []
         for dt_idx, row in df.iterrows():
             rows.append({
@@ -398,7 +442,12 @@ def _fetch_ohlcv_live(code: str, period: str) -> list[dict]:
 
 
 def _fetch_supply_live(code: str) -> list[dict]:
-    """개인/외국인/기관 수급 (pykrx, 만원 단위)."""
+    """개인/외국인/기관 수급 (pykrx, 만원 단위).
+
+    pykrx의 get_market_trading_value_by_investor(from, to, ticker)는
+    날짜 범위를 주면 기간 합산값만 반환하므로, 날짜별로 개별 호출해서
+    일별 데이터를 구성한다.
+    """
     if not code.isdigit():
         return []  # US 종목은 빈 리스트 즉시 반환
 
@@ -406,17 +455,43 @@ def _fetch_supply_live(code: str) -> list[dict]:
 
     today   = _now().strftime("%Y%m%d")
     from_dt = (datetime.now(timezone.utc) - pd.Timedelta(days=45)).strftime("%Y%m%d")
-    df = stock.get_market_trading_value_by_investor(from_dt, today, code)
 
-    rows = []
-    for dt_idx, row in df.iterrows():
-        rows.append({
-            "date":        str(dt_idx)[:10],
-            "individual":  int(row.loc["개인",   "순매수"] // 10000),
-            "foreign":     int(row.loc["외국인", "순매수"] // 10000),
-            "institution": int(row.loc["기관합계","순매수"] // 10000),
-        })
-    return rows[-30:]  # 최근 30일
+    # 거래일 목록 — OHLCV에서 날짜 추출 (최근 10 거래일만 수집, 화면 표시는 5일)
+    ohlcv_df = stock.get_market_ohlcv(from_dt, today, code)
+    if ohlcv_df.empty:
+        raise RuntimeError(f"OHLCV empty for {code}")
+
+    trading_dates = [d.strftime("%Y%m%d") for d in ohlcv_df.index[-10:]]
+
+    rows: list[dict] = []
+    for date_str in trading_dates:
+        try:
+            df = stock.get_market_trading_value_by_investor(date_str, date_str, code)
+            if df.empty:
+                continue
+            idx = df.index.tolist()
+            foreign_key = "외국인합계" if "외국인합계" in idx else "외국인"
+
+            def _val(investor: str) -> int:
+                try:
+                    return int(df.loc[investor, "순매수"] // 10000)
+                except (KeyError, TypeError, ValueError):
+                    return 0
+
+            rows.append({
+                "date":        f"{date_str[:4]}-{date_str[4:6]}-{date_str[6:]}",
+                "individual":  _val("개인"),
+                "foreign":     _val(foreign_key),
+                "institution": _val("기관합계"),
+            })
+        except Exception as e:
+            logger.debug(f"supply skip {date_str}: {e}")
+
+    if not rows:
+        raise RuntimeError(f"supply all dates failed for {code}")
+
+    logger.info(f"supply live OK: {code} {len(rows)}일")
+    return rows
 
 
 def _fetch_valuation_live(code: str) -> dict:
@@ -590,11 +665,18 @@ def get_stock_list() -> list[dict]:
 
 
 def get_ohlcv(code: str, period: str = "1y") -> list[dict]:
-    cache_key  = f"ohlcv_{code}_{period}"
-    mock_file  = f"krx_{code}.json" if code.isdigit() else f"m7_{code}.json"
+    cache_key = f"ohlcv_{code}_{period}"
+    mock_file = f"krx_{code}.json" if code.isdigit() else f"m7_{code}.json"
 
     if not _ttl_expired(cache_key):
         return _cache[cache_key]["data"]
+
+    if API_MODE == "mock":
+        all_rows = load_mock(mock_file)
+        n = _PERIOD_TRADING_DAYS.get(period, 252)
+        data = all_rows[-n:] if n < len(all_rows) else all_rows
+        _cache[cache_key] = {"data": data, "updated_at": _now(), "is_mock": True}
+        return data
 
     return _with_fallback(cache_key, lambda: _fetch_ohlcv_live(code, period), mock_file)
 

@@ -2,7 +2,7 @@
 // 백엔드 호출 함수는 이 파일에서만 정의. 컴포넌트 내부 fetch 직접 호출 금지.
 // fetchZone → fetchSilhouette 수정: /zone 엔드포인트 없음, /silhouette 통합 (common-base.md 6.1)
 
-const BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const BASE = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/^﻿/, "") || "http://localhost:8000";
 const POLL = 900_000; // 15분
 
 export const fetchFearGreedKR = () => fetch(`${BASE}/api/market/fear-greed/kr`);
@@ -19,6 +19,17 @@ export const fetchSupply    = (code: string) => fetch(`${BASE}/api/stock/${code}
 export const fetchValuation = (code: string) => fetch(`${BASE}/api/stock/${code}/valuation`);
 export const fetchInsight   = (code: string) =>
   fetch(`${BASE}/api/insight/${code}`, { method: "POST" });
+export const fetchMarketInsight = (body: {
+  indices: { name: string; value: number; change_pct: number }[];
+  fear_greed_kr: { score: number; status: string };
+  fear_greed_us: { score: number; status: string };
+  buffett: { value: number; status: string };
+}) =>
+  fetch(`${BASE}/api/insight/market`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
 export const fetchCalendar  = (year: number, month: number) =>
   fetch(`${BASE}/api/calendar?year=${year}&month=${month}`);
 

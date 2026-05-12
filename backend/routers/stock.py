@@ -1,6 +1,104 @@
-"""stock.py — 이승재 담당 라우터 (스텁)
-실제 구현: routers/stock.py 작업 단계에서 완성.
 """
-from fastapi import APIRouter
+stock.py — 이승재 담당 라우터
+prefix: /api/stock  (main.py include_router에서 부여)
 
+엔드포인트
+    GET /list               → 종목 리스트 (KOSPI 대형주 + M7)
+    GET /{code}/ohlcv       → OHLCV + MA(5/20/60/120) + 볼린저밴드
+    GET /{code}/supply      → 수급 (개인/외국인/기관 순매수)
+    GET /{code}/valuation   → 밸류에이션 (PER/PBR/ROE/EPS)
+    GET /{code}/silhouette  → 무릎-어깨 실루엣 5구간 판정
+"""
+import logging
+
+import pandas as pd
+from fastapi import APIRouter, HTTPException, Query
+
+from services import data_collector, indicator, silhouette
+
+logger = logging.getLogger(__name__)
 router = APIRouter()
+
+
+# ── GET /list ─────────────────────────────────────────────────────────────
+# NOTE: /{code}/... 경로보다 먼저 등록해야 "list"가 path param으로 오인되지 않음
+
+@router.get("/list")
+def get_stock_list():
+    """종목 리스트 (KOSPI 대형주 + M7). 15분 스케줄러 캐시."""
+    return data_collector.get_stock_list()
+
+
+# ── GET /{code}/ohlcv ─────────────────────────────────────────────────────
+
+@router.get("/{code}/ohlcv")
+def get_ohlcv(
+    code: str,
+    period: str = Query("1y", description="기간: 1y | 6m | 3m | 1m"),
+):
+    """
+    OHLCV + MA(5/20/60/120일 SMA) + 볼린저밴드(20일/2σ) 반환.
+
+    내부적으로 RSI/BB 수렴을 위해 워밍업 포함 전체 데이터로 지표 계산 후,
+    화면 표시용 기간(period)에 해당하는 최신 N행만 반환.
+    """
+    all_raw = data_collector.get_ohlcv(code, period)
+    if not all_raw:
+        raise HTTPException(status_code=404, detail=f"OHLCV data not found: {code}")
+
+    # 지표는 워밍업 포함 전체 데이터로 계산
+    ohlcv_df   = pd.DataFrame(all_raw)
+    indicators = indicator.compute(ohlcv_df)
+
+    # 표시는 요청 기간에 해당하는 최신 N행만
+    n_display  = data_collector.PERIOD_TRADING_DAYS.get(period, 252)
+    start_i    = max(0, len(all_raw) - n_display)
+
+    result = []
+    for i in range(start_i, len(all_raw)):
+        row = dict(all_raw[i])
+        row["ma5"]      = indicators["ma5"][i]
+        row["ma20"]     = indicators["ma20"][i]
+        row["ma60"]     = indicators["ma60"][i]
+        row["ma120"]    = indicators["ma120"][i]
+        row["bb_upper"] = indicators["bb_upper"][i]
+        row["bb_lower"] = indicators["bb_lower"][i]
+        result.append(row)
+
+    return result
+
+
+# ── GET /{code}/supply ────────────────────────────────────────────────────
+
+@router.get("/{code}/supply")
+def get_supply(code: str):
+    """
+    개인/외국인/기관 순매수 (만원 단위 정수, 최근 30일).
+    US 종목(비숫자 code)은 data_collector에서 [] 즉시 반환.
+    """
+    return data_collector.get_supply(code)
+
+
+# ── GET /{code}/valuation ─────────────────────────────────────────────────
+
+@router.get("/{code}/valuation")
+def get_valuation(code: str):
+    """PER / PBR / ROE / EPS + 업종 PER + per·pbr·roe 신호 문자열."""
+    return data_collector.get_valuation(code)
+
+
+# ── GET /{code}/silhouette ────────────────────────────────────────────────
+
+@router.get("/{code}/silhouette")
+def get_silhouette(code: str):
+    """
+    무릎-어깨 실루엣 5구간 판정 + RSI 보정.
+    1년치 OHLCV → indicator.compute() → silhouette.get_zone() 순으로 오케스트레이션.
+    """
+    ohlcv_raw = data_collector.get_ohlcv(code, "1y")
+    if not ohlcv_raw:
+        raise HTTPException(status_code=404, detail=f"OHLCV data not found: {code}")
+
+    ohlcv_df   = pd.DataFrame(ohlcv_raw)
+    indicators = indicator.compute(ohlcv_df)
+    return silhouette.get_zone(ohlcv_df, indicators["rsi"])
